@@ -1,0 +1,11 @@
+Simple Java bindings for the SpringSense Meaning Recognition API.
+
+NOTE:
+Using the API is subject to usage agreement. See SpringSense.com for more information.
+
+Usage:
+- TBA
+
+Dependencies:
+- Google Gson 1.6x
+
