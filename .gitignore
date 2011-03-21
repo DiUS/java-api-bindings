@@ -1,1 +1,5 @@
 nbproject/*
+build/*
+dist/*
+.DS_Store
+lib/nblibraries-private.properties
