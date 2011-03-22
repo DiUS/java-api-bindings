@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A dismabiguation result
+ * A dismabiguation result. Returned from a meaningRecognitionAPI.recognize(...) call.
  */
-class DisambiguationResult {
+public class DisambiguationResult {
 
     private List<Sentence> sentences;
 
@@ -27,6 +27,10 @@ class DisambiguationResult {
     private DisambiguationResult() {
     }
 
+    /**
+     * Returns the sentences that comprise the disambiguation result
+     * @return A list of sentences that comprise the disambiguation result
+     */
     public List<Sentence> getSentences() {
         return sentences;
     }
@@ -35,12 +39,22 @@ class DisambiguationResult {
         this.sentences = sentences;
     }
 
-    protected static class Sentence {
+    /**
+     * A disambiguated sentence
+     */
+    public static class Sentence {
 
         private double[] scores;
         private List<Term> terms;
         private List<VariantSentence> variants;
 
+        protected Sentence() {
+        }
+
+        /**
+         * Returns the scores for the various variants in the sentence
+         * @return An array of doubles containing the normalised (to 1.0) score breakdown of the potential disambiguation variants for the sentence
+         */
         public double[] getScores() {
             return scores;
         }
@@ -49,6 +63,10 @@ class DisambiguationResult {
             this.scores = scores;
         }
 
+        /**
+         * Returns the list of terms comprising the disambiguated sentence
+         * @return The list of terms comprising the disambiguated sentence
+         */
         public List<Term> getTerms() {
             return terms;
         }
@@ -57,6 +75,10 @@ class DisambiguationResult {
             this.terms = terms;
         }
 
+        /**
+         * Returns the individual disambiguated variants for the sentence
+         * @return A list of the individual disambiguated variants for the sentence
+         */
         List<VariantSentence> getVariants() {
             if (variants == null) {
                 variants = calculateVariants();
@@ -98,7 +120,7 @@ class DisambiguationResult {
                     if (resolvedTerm == null) {
                         // New one
                         resolvedTerm = new ResolvedTerm(term, meaning, getScores()[i]);
-                        resolvedTermsByMeaning.put( meaningToken, resolvedTerm);
+                        resolvedTermsByMeaning.put(meaningToken, resolvedTerm);
                     } else {
                         resolvedTerm.setScore(resolvedTerm.getScore() + getScores()[i]);
                     }
@@ -121,24 +143,33 @@ class DisambiguationResult {
 
             return sb.toString().trim();
         }
-
-
     }
 
-    protected static class VariantSentence {
+    /**
+     * A disambiguated variant sentence
+     */
+    public static class VariantSentence {
 
         private double score;
         private List<ResolvedTerm> terms;
 
-        VariantSentence(double score, List<ResolvedTerm> terms) {
+        protected VariantSentence(double score, List<ResolvedTerm> terms) {
             this.score = score;
             this.terms = terms;
         }
 
+        /**
+         * Returns the probable score for the variant sentence
+         * @return A double which is the probable score for the variant sentence
+         */
         public double getScore() {
             return score;
         }
 
+        /**
+         * Returns the disambiguated terms comprising this variant
+         * @return A list of disambiguated terms comprising this variant
+         */
         public List<ResolvedTerm> getTerms() {
             return terms;
         }
@@ -156,13 +187,16 @@ class DisambiguationResult {
         }
     }
 
-    protected static class ResolvedTerm {
+    /**
+     * Encapsulates resolved term, a specific meaning which is part of a specific variant of a disambiguated sentence
+     */
+    public static class ResolvedTerm {
 
         private Term originalTerm;
         private Meaning meaning;
         private double score;
 
-        ResolvedTerm(Term originalTerm, Meaning meaning, double score) {
+        protected ResolvedTerm(Term originalTerm, Meaning meaning, double score) {
             this.originalTerm = originalTerm;
             this.meaning = meaning;
             this.score = score;
@@ -198,42 +232,64 @@ class DisambiguationResult {
         }
     }
 
-    protected static class Term {
+    /**
+     * This class encapsulates a term, potentially with multiple meanings
+     */
+    public static class Term {
 
         private String lemma;
         private String word;
         private String POS;
         private List<Meaning> meanings;
 
+        protected Term() {
+        }
+
+        /**
+         * Returns the part-of-speech as determined by the API
+         * @return
+         */
         public String getPOS() {
             return POS;
         }
 
-        public void setPOS(String POS) {
+        protected void setPOS(String POS) {
             this.POS = POS;
         }
 
+        /**
+         * Returns the lemmatized form of the term
+         * @return A string, the lemmatized form of the term
+         */
         public String getLemma() {
             return lemma;
         }
 
-        public void setLemma(String lemma) {
+        protected void setLemma(String lemma) {
             this.lemma = lemma;
         }
 
+        /**
+         * Returns the multiple potential meanings of the term if the API determined them
+         * @return A list of the multiple potential meanings for the term
+         */
         public List<Meaning> getMeanings() {
             return meanings;
         }
 
-        public void setMeanings(List<Meaning> meanings) {
+        protected void setMeanings(List<Meaning> meanings) {
             this.meanings = meanings;
         }
 
+        /**
+         * Returns the original form of the term
+         * @return The original form of the term
+         */
         public String getWord() {
             return word;
         }
 
-        public void setWord(String word) {
+        protected void setWord(String word) {
             this.word = word;
         }
 
@@ -241,28 +297,40 @@ class DisambiguationResult {
         public String toString() {
             return getWord();
         }
-
-
     }
 
-    protected static class Meaning {
+    /**
+     * One potential meaning of a term, with its definition
+     */
+    public static class Meaning {
 
         private String definition;
         private String meaning;
 
+        protected Meaning() {
+        }
+
+        /**
+         * Returns the definition of the meaning, according to WordNet
+         * @return The definition of the meaning, according to WordNet
+         */
         public String getDefinition() {
             return definition;
         }
 
-        public void setDefinition(String definition) {
+        protected void setDefinition(String definition) {
             this.definition = definition;
         }
 
+        /**
+         * Returns the meaning token for the meaning, according to the WordNet conventions
+         * @return The meaning token for the meaning, according to the WordNet conventions
+         */
         public String getMeaning() {
             return meaning;
         }
 
-        public void setMeaning(String meaning) {
+        protected void setMeaning(String meaning) {
             this.meaning = meaning;
         }
     }

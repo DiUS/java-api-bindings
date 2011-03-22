@@ -8,19 +8,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * API binding class
+ * SpringSense Meaning Recognition API binding class
  */
-class MeaningRecognitionAPI {
+public class MeaningRecognitionAPI {
 
     private String url;
     private String customerId;
     private String apiKey;
     private Proxy proxy;
 
+    /**
+     * Create a Meaning Recognition API entry point with the specified end-point URL, customer id and API key
+     * @param url The end-point URL to use. Most likeley http://api.springsense.com/disambiguate
+     * @param customerId Your customer id, get yours at http://springsense.com/api
+     * @param apiKey Your secret API key
+     */
     public MeaningRecognitionAPI(String url, String customerId, String apiKey) {
         this(url, customerId, apiKey, null);
     }
 
+    /**
+     * Create a Meaning Recognition API entry point with the specified end-point URL, customer id and API key, going through the specified proxy
+     * @param url The end-point URL to use. Most likeley http://api.springsense.com/disambiguate
+     * @param customerId Your customer id, get yours at http://springsense.com/api
+     * @param apiKey Your secret API key
+     * @param proxy The Proxy to use for communications
+     */
     public MeaningRecognitionAPI(String url, String customerId, String apiKey, Proxy proxy) {
         this.url = url;
         this.customerId = customerId;
@@ -28,19 +41,25 @@ class MeaningRecognitionAPI {
         this.proxy = proxy;
     }
 
-    public String getApiKey() {
+    String getApiKey() {
         return apiKey;
     }
 
-    public String getCustomerId() {
+    String getCustomerId() {
         return customerId;
     }
 
-    public String getUrl() {
+    String getUrl() {
         return url;
     }
 
-    DisambiguationResult recognize(String textToRecognize) throws Exception {
+    /**
+     * Makes a remote procedure call to the Meaning Recognition API server and attempts to disambiguate the specified text
+     * @param textToRecognize The text to recognize, limited to 512 characters.
+     * @return The disambiguated (recognized) result
+     * @throws Exception In case of a communications or security error
+     */
+    public DisambiguationResult recognize(String textToRecognize) throws Exception {
         final String jsonResponse = callRestfulWebService(getAuthorizationParameters(), textToRecognize);
         return DisambiguationResult.fromJson(jsonResponse);
     }
