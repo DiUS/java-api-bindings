@@ -79,7 +79,7 @@ public class DisambiguationResult {
          * Returns the individual disambiguated variants for the sentence
          * @return A list of the individual disambiguated variants for the sentence
          */
-        List<VariantSentence> getVariants() {
+        public List<VariantSentence> getVariants() {
             if (variants == null) {
                 variants = calculateVariants();
             }
