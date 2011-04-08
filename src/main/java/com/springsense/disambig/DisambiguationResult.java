@@ -1,18 +1,22 @@
 package com.springsense.disambig;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 /**
  * A dismabiguation result. Returned from a meaningRecognitionAPI.recognize(...) call.
  */
-public class DisambiguationResult {
+public class DisambiguationResult implements Serializable {
 
-    private List<Sentence> sentences;
+	private static final long serialVersionUID = 1L;
+	
+	private List<Sentence> sentences;
 
     static DisambiguationResult fromJson(String json) {
         List<Sentence> sentences = new Gson().fromJson(json, new TypeToken<List<Sentence>>() {
@@ -42,9 +46,13 @@ public class DisambiguationResult {
     /**
      * A disambiguated sentence
      */
-    public static class Sentence {
+    public static class Sentence implements Serializable {
 
-        private double[] scores;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private double[] scores;
         private List<Term> terms;
         private List<VariantSentence> variants;
 
@@ -148,9 +156,13 @@ public class DisambiguationResult {
     /**
      * A disambiguated variant sentence
      */
-    public static class VariantSentence {
+    public static class VariantSentence implements Serializable {
 
-        private double score;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private double score;
         private List<ResolvedTerm> terms;
 
         protected VariantSentence(double score, List<ResolvedTerm> terms) {
@@ -190,9 +202,11 @@ public class DisambiguationResult {
     /**
      * Encapsulates resolved term, a specific meaning which is part of a specific variant of a disambiguated sentence
      */
-    public static class ResolvedTerm {
+    public static class ResolvedTerm implements Serializable {
 
-        private Term originalTerm;
+		private static final long serialVersionUID = 1L;
+		
+		private Term originalTerm;
         private Meaning meaning;
         private double score;
 
@@ -235,9 +249,11 @@ public class DisambiguationResult {
     /**
      * This class encapsulates a term, potentially with multiple meanings
      */
-    public static class Term {
+    public static class Term implements Serializable {
 
-        private String lemma;
+		private static final long serialVersionUID = 1L;
+		
+		private String lemma;
         private String word;
         private String POS;
         private List<Meaning> meanings;
@@ -302,9 +318,11 @@ public class DisambiguationResult {
     /**
      * One potential meaning of a term, with its definition
      */
-    public static class Meaning {
+    public static class Meaning implements Serializable {
 
-        private String definition;
+		private static final long serialVersionUID = 1L;
+		
+		private String definition;
         private String meaning;
 
         protected Meaning() {
