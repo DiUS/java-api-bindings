@@ -14,9 +14,8 @@ import com.google.gson.reflect.TypeToken;
  */
 public class DisambiguationResult implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-	
-	private List<Sentence> sentences;
+    private static final long serialVersionUID = 1L;
+    private List<Sentence> sentences;
 
     static DisambiguationResult fromJson(String json) {
         List<Sentence> sentences = new Gson().fromJson(json, new TypeToken<List<Sentence>>() {
@@ -49,10 +48,10 @@ public class DisambiguationResult implements Serializable {
     public static class Sentence implements Serializable {
 
         /**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-		private double[] scores;
+         *
+         */
+        private static final long serialVersionUID = 1L;
+        private double[] scores;
         private List<Term> terms;
         private List<VariantSentence> variants;
 
@@ -159,10 +158,10 @@ public class DisambiguationResult implements Serializable {
     public static class VariantSentence implements Serializable {
 
         /**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-		private double score;
+         *
+         */
+        private static final long serialVersionUID = 1L;
+        private double score;
         private List<ResolvedTerm> terms;
 
         protected VariantSentence(double score, List<ResolvedTerm> terms) {
@@ -204,9 +203,8 @@ public class DisambiguationResult implements Serializable {
      */
     public static class ResolvedTerm implements Serializable {
 
-		private static final long serialVersionUID = 1L;
-		
-		private Term originalTerm;
+        private static final long serialVersionUID = 1L;
+        private Term originalTerm;
         private Meaning meaning;
         private double score;
 
@@ -251,9 +249,8 @@ public class DisambiguationResult implements Serializable {
      */
     public static class Term implements Serializable {
 
-		private static final long serialVersionUID = 1L;
-		
-		private String lemma;
+        private static final long serialVersionUID = 1L;
+        private String lemma;
         private String word;
         private String POS;
         private List<Meaning> meanings;
@@ -263,7 +260,7 @@ public class DisambiguationResult implements Serializable {
 
         /**
          * Returns the part-of-speech as determined by the API
-         * @return
+         * @return The part-of-speech identifier for the term
          */
         public String getPOS() {
             return POS;
@@ -320,9 +317,8 @@ public class DisambiguationResult implements Serializable {
      */
     public static class Meaning implements Serializable {
 
-		private static final long serialVersionUID = 1L;
-		
-		private String definition;
+        private static final long serialVersionUID = 1L;
+        private String definition;
         private String meaning;
 
         protected Meaning() {
