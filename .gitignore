@@ -2,3 +2,4 @@ build/*
 dist/*
 .DS_Store
 lib/nblibraries-private.properties
+nbproject/private/
