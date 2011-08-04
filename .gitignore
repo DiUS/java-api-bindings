@@ -3,31 +3,5 @@ dist/*
 .DS_Store
 lib/nblibraries-private.properties
 nbproject/private/
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="src" path="src/test/java"/>
-	<classpathentry kind="lib" path="lib/google-gson-1.6/gson-1.6.jar"/>
-	<classpathentry kind="lib" path="lib/junit_4/junit-4.8.jar"/>
-	<classpathentry kind="lib" path="lib/junit_4/hamcrest-core.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/opencsv-2.3/opencsv-2.3.jar"/>
-	<classpathentry kind="output" path="build/eclipse"/>
-</classpath>
-<?xml version="1.0" encoding="UTF-8"?>
-<projectDescription>
-	<name>SpringSense API bindings</name>
-	<comment></comment>
-	<projects>
-	</projects>
-	<buildSpec>
-		<buildCommand>
-			<name>org.eclipse.jdt.core.javabuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-	</buildSpec>
-	<natures>
-		<nature>org.eclipse.jdt.core.javanature</nature>
-	</natures>
-</projectDescription>
+.project
+.classpath
