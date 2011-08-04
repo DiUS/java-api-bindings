@@ -2,6 +2,8 @@ package com.springsense.disambig;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +17,8 @@ import com.google.gson.reflect.TypeToken;
 public class DisambiguationResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private List<Sentence> sentences;
+    private List<Sentence> sentences = null;
+    private List<Variant> variants = null;
 
     static DisambiguationResult fromJson(String json) {
         List<Sentence> sentences = new Gson().fromJson(json, new TypeToken<List<Sentence>>() {
@@ -41,6 +44,51 @@ public class DisambiguationResult implements Serializable {
     public void setSentences(List<Sentence> sentences) {
         this.sentences = sentences;
     }
+    
+    /**
+     * Returns the result as a list of variants, each having multiple variant sentences
+     * @return The result as a list of variants, each having multiple variant sentences
+     */
+	public List<Variant> getVariants() {
+		if (variants == null) { 
+			int maxNumberOfVariants = getHighestNumberOfVariants();
+			
+			VariantSentence[][] variantMatrix = new VariantSentence[maxNumberOfVariants][sentences.size()];
+			
+			for (int s = 0; s < sentences.size(); s++) {
+				Sentence sentence = sentences.get(s);
+				for (int v = 0; v < maxNumberOfVariants; v++) {
+					List<VariantSentence> sentenceVariants = sentence.getVariants();
+					int sizeOfSentenceVariants = sentenceVariants.size();
+					
+					VariantSentence variantSentence = sentenceVariants.get(v < sizeOfSentenceVariants ? v : 0);
+					
+					variantMatrix[v][s] = variantSentence;
+				}
+			}
+			
+			variants = new ArrayList<Variant>(variantMatrix.length);
+			for (int v = 0; v < maxNumberOfVariants; v++) {
+				variants.add(new Variant(Arrays.asList(variantMatrix[v])));
+			}
+			
+		}
+		return Collections.unmodifiableList(variants);
+	}
+
+	/**
+	 * Returns the highest number of variants in the result sentences.
+	 * @return The highest number of variants in the result sentences.
+	 */
+	protected int getHighestNumberOfVariants() {
+		int maxNumberOfVariants = 0; 
+		for (Sentence sentence : sentences) {
+			List<VariantSentence> sentenceVariants = sentence.getVariants();
+			
+			maxNumberOfVariants = Math.max(maxNumberOfVariants, sentenceVariants.size());
+		}
+		return maxNumberOfVariants;
+	}
 
     /**
      * A disambiguated sentence
@@ -347,5 +395,32 @@ public class DisambiguationResult implements Serializable {
         protected void setMeaning(String meaning) {
             this.meaning = meaning;
         }
+    }
+
+    public static class Variant implements Serializable {
+    	private static final long serialVersionUID = 1L;
+    	
+    	List<VariantSentence> sentences;
+    	
+    	protected Variant(List<VariantSentence> sentences) {
+			super();
+			this.sentences = sentences;
+		}
+
+		public List<VariantSentence> getSentences() {
+			return Collections.unmodifiableList(sentences);
+    	}
+		
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+
+            for (VariantSentence s : getSentences()) {
+                sb.append(s.toString());
+                sb.append(' ');
+            }
+
+            return sb.toString().trim();
+        }		
     }
 }
