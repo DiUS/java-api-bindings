@@ -142,10 +142,11 @@ public class DisambiguationResult implements Serializable {
         }
 
         private List<VariantSentence> calculateVariants() {
-            final int cardinality = getScores().length;
+            int scoresCount = scores.length;
+			final int cardinality = Math.max(scoresCount, 1);
             List<VariantSentence> variants = new ArrayList<VariantSentence>(cardinality);
             for (int i = 0; i < cardinality; i++) {
-                variants.add(new VariantSentence(getScores()[i], new ArrayList<ResolvedTerm>(getTerms().size())));
+                variants.add(new VariantSentence(i < scoresCount ? scores[i] : 1.0, new ArrayList<ResolvedTerm>(getTerms().size())));
             }
             for (Term term : getTerms()) {
                 List<ResolvedTerm> resolvedTermsForTerm = termToResolvedTerms(term, cardinality);
