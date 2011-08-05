@@ -9,19 +9,31 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+
+import com.google.common.base.Function;
+import com.google.common.collect.MapMaker;
 
 /**
  * SpringSense Meaning Recognition API binding class
  */
 public class MeaningRecognitionAPI {
 
+	private static final int DEFAULT_NUMBER_OF_RETRIES = 3;
+	private static final int DEFAULT_WAIT_BETWEEN_RETRIES = 2000;
+	private static final int DEFAULT_MAX_CACHE_SIZE = 10000;
+	private static final int DEFAULT_NUMBER_OF_CONCURRENT_THREADS = 4;
+	
 	private String url;
 	private String customerId;
 	private String apiKey;
 	private Proxy proxy;
 
-	private int numberOfRetries = 3;
-	private long waitBetweenRetries = 2000;
+	private int numberOfRetries = DEFAULT_NUMBER_OF_RETRIES;
+	private long waitBetweenRetries = DEFAULT_WAIT_BETWEEN_RETRIES;
+	
+	private final ConcurrentMap<String, DisambiguationResult> cache;
 
 	/**
 	 * Create a Meaning Recognition API entry point with the specified end-point
@@ -36,7 +48,7 @@ public class MeaningRecognitionAPI {
 	 *            Your secret API key
 	 */
 	public MeaningRecognitionAPI(String url, String customerId, String apiKey) {
-		this(url, customerId, apiKey, null);
+		this(url, customerId, apiKey, null, DEFAULT_MAX_CACHE_SIZE, DEFAULT_NUMBER_OF_CONCURRENT_THREADS);
 	}
 
 	/**
@@ -52,13 +64,31 @@ public class MeaningRecognitionAPI {
 	 *            Your secret API key
 	 * @param proxy
 	 *            The Proxy to use for communications
+	 * @param maxCacheSize TODO
+	 * @param expectedNumberOfConcurrentThreads TODO
 	 */
 	public MeaningRecognitionAPI(String url, String customerId, String apiKey,
-			Proxy proxy) {
+			Proxy proxy, int maxCacheSize, int expectedNumberOfConcurrentThreads) {
 		this.url = url;
 		this.customerId = customerId;
 		this.apiKey = apiKey;
 		this.proxy = proxy;
+		
+		cache = buildLRUCache(maxCacheSize, expectedNumberOfConcurrentThreads);
+	}
+
+	protected ConcurrentMap<String, DisambiguationResult> buildLRUCache(
+			int maxCacheSize, int expectedNumberOfConcurrentThreads) {
+		return new MapMaker()
+	       .concurrencyLevel(expectedNumberOfConcurrentThreads)
+	       .maximumSize(maxCacheSize)
+	       .expireAfterWrite(365, TimeUnit.DAYS)
+	       .makeComputingMap(
+	           new Function<String, DisambiguationResult>() {
+	             public DisambiguationResult apply(String key) {
+	               return recognizeUncached(key);
+	             }
+	           });
 	}
 
 	String getApiKey() {
@@ -90,7 +120,7 @@ public class MeaningRecognitionAPI {
 	}
 
 	/**
-	 * Makes a remote procedure call to the Meaning Recognition API server and
+	 * Makes a cached remote procedure call to the Meaning Recognition API server and
 	 * attempts to disambiguate the specified text
 	 * 
 	 * @param textToRecognize
@@ -99,7 +129,11 @@ public class MeaningRecognitionAPI {
 	 * @throws Exception
 	 *             In case of a communications or security error
 	 */
-	public DisambiguationResult recognize(String textToRecognize) throws Exception {
+	public DisambiguationResult recognize(String textToRecognize) {
+		return cache.get(textToRecognize);
+	}
+	
+	public DisambiguationResult recognizeUncached(String textToRecognize) {
         String jsonResponse = null;
         int attempt = 0;
         
@@ -111,7 +145,11 @@ public class MeaningRecognitionAPI {
         		if (attempt > getNumberOfRetries()) {
         			throw new RuntimeException(String.format("Tried %d times, but still could not disambiguate '%s'. Latest error attached.", attempt, textToRecognize), e);
         		}
-        		Thread.sleep(waitBetweenRetries);
+        		try {
+					Thread.sleep(waitBetweenRetries);
+				} catch (InterruptedException e1) {
+        			// Ignore sleep interruption, simply proceed to next retry
+				}
         	}
         	
         }
@@ -119,7 +157,7 @@ public class MeaningRecognitionAPI {
         return DisambiguationResult.fromJson(jsonResponse);
     }
 
-	private Map<String, String> getAuthorizationParameters() {
+	protected Map<String, String> getAuthorizationParameters() {
 		Map<String, String> map = new HashMap<String, String>();
 
 		map.put("customerId", getCustomerId());
@@ -128,7 +166,7 @@ public class MeaningRecognitionAPI {
 		return map;
 	}
 
-	private String buildWebQuery(Map<String, String> parameters)
+	protected String buildWebQuery(Map<String, String> parameters)
 			throws Exception {
 		StringBuilder sb = new StringBuilder();
 		for (Map.Entry<String, String> entry : parameters.entrySet()) {
@@ -139,7 +177,7 @@ public class MeaningRecognitionAPI {
 		return sb.toString().substring(0, sb.length() - 1);
 	}
 
-	private String callRestfulWebService(Map<String, String> parameters,
+	protected String callRestfulWebService(Map<String, String> parameters,
 			String body) throws Exception {
 		String response = null;
 		final String queryString = buildWebQuery(parameters);
