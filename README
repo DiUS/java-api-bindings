@@ -1,12 +1,22 @@
-Simple Java bindings for the SpringSense Meaning Recognition API.
+Java bindings for the SpringSense Meaning Recognition API with LRU caching built in.
 
 NOTE:
 Using the API is subject to usage agreement. See SpringSense.com for more information.
 
 Usage:
-- TBA
+- See the javadocs
 
-Dependencies:
+Building:
+- Requires RVM installed, with jruby installed as a ruby for it (rvm install jruby)
+
+- To build:
+  rvm use jruby
+  gem install bundler
+
+  bundle install
+  buildr
+
+Runtime Dependencies:
 - Google Gson 1.6x
 - OpenCSV 2.3
-
+- Google Guava r09
