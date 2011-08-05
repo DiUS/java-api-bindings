@@ -4,15 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import com.google.common.base.Function;
-import com.google.common.collect.MapEvictionListener;
-import com.google.common.collect.MapMaker;
 
 public class MeaningRecognitionAPICacheTest {
 

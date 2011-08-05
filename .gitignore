@@ -5,3 +5,5 @@ lib/nblibraries-private.properties
 nbproject/private/
 .project
 .classpath
+reports
+target
