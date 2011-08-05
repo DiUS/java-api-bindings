@@ -23,7 +23,7 @@ define "java_api_bindings" do
   OPENCSV = artifact('net.sf.opencsv:opencsv:jar:2.3')  
   GUAVA = artifact('com.google.guava:guava:jar:r09')  
 
-  JUNIT4 = artifact("junit4:junit4:jar:4.8.2")
+  JUNIT4 = artifact("junit:junit:jar:4.8.2")
   HAMCREST = artifact("org.hamcrest:hamcrest-core:jar:1.2.1")
   MOCKITO = artifact("org.mockito:mockito-all:jar:1.8.5")
        

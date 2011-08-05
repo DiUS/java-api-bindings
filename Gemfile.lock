@@ -1,5 +1,5 @@
 GIT
-  remote: git://github.com/jvshahid/buildr-dependency-extensions.git
+  remote: https://github.com/jvshahid/buildr-dependency-extensions.git
   revision: 4dcf8b151b3cf8da98c5775248bd9e6d4773d1ab
   specs:
     buildr-dependency-extensions (0.2-java)
