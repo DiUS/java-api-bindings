@@ -14,9 +14,6 @@ import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
@@ -217,6 +214,8 @@ public class MeaningRecognitionAPI {
 	}
 
 	private void loadStoredCacheEntries() {
+		Logger logger = Logger.getLogger(getClass().getName());
+
 		if (cacheStoreDir == null) {
 			return;
 		}
@@ -239,7 +238,7 @@ public class MeaningRecognitionAPI {
 			try {
 				loadStoredCacheEntry(cacheEntryFile);
 			} catch (IOException e) {
-				Logger.getLogger(getClass().getName())
+				logger
 						.log(Level.WARNING,
 								String.format(
 										"Could not load cache entry file: '%s' due to an error. Skipping it.",
@@ -247,6 +246,8 @@ public class MeaningRecognitionAPI {
 				;
 			}
 		}
+		
+		logger.info(String.format("Loaded %d cache entries from store.", cache.size()));
 	}
 
 	private void loadStoredCacheEntry(File cacheEntryFile) throws IOException {
@@ -267,7 +268,8 @@ public class MeaningRecognitionAPI {
 						"Wrong version cache entry: %d", cacheEntryVersion));
 			}
 
-			Long timestamp = (Long) objIn.readObject();
+			@SuppressWarnings("unused")
+			final Long timestamp = (Long) objIn.readObject();
 			String textToRecognize = (String) objIn.readObject();
 			DisambiguationResult recognitionResult = (DisambiguationResult) objIn
 					.readObject();
