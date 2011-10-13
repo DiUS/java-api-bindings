@@ -89,7 +89,7 @@ public class DisambiguationResultTest {
 		assertEquals(3, multipleMeaningsSentence.getVariants().size());
 
 		assertEquals(
-				"pulse_n_02 them through the sieve_n_01 , return_n_11 them down seal_n_02 out in water_n_01 for a stew-pan in this is well some cold_water_n_01 , and a puree_n_01 with all , and in a shallow lawsuit_n_01 must already salted body_of_water_n_01 or location_n_01 .",
+				"pulse_n_02 them through the sieve_n_01 , return_n_11 them down seal_n_02 out in water_n_01 for a stew-pan in this is well some cold_water_n_01 , and a puree_n_01 with all , and in a shallow lawsuit_n_01 must already salted body_of_water_n_01 or Liebig .",
 				lastVariant.toString());
 
 		final ResolvedTerm pulseFromLastVariant = lastVariant.getTerms().get(0);
@@ -152,7 +152,7 @@ public class DisambiguationResultTest {
 	@Test
 	public void testVariantsToString() {
 		assertEquals(
-				"dish_n_02 , very hot fat . Send them into another one can make little feculina flour_n_01 . pulse_n_02 them through the sieve_n_01 , return_n_11 them down tender_n_01 out in water_n_01 for a stew-pan in this is well some cold_water_n_01 , and a puree_n_01 with all , and in a shallow case_n_01 must already salted body_of_water_n_01 or location_n_01 . You will hold your omelet_n_01 , so as you wish to it , retention_n_01 hot dish_n_01 . A quart_n_01 of a half a lemon_n_03 . This dish_n_01 is good white crumb_n_03 of crumb_n_03 of carrot_n_02 ; then peel_n_02 them for five leaves and five flat in the meat_n_01 must exhibit_n_01 the same measure_n_02",
+				"dish_n_02 , very hot fat . Send them into another one can make little feculina flour_n_01 . pulse_n_02 them through the sieve_n_01 , return_n_11 them down tender_n_01 out in water_n_01 for a stew-pan in this is well some cold_water_n_01 , and a puree_n_01 with all , and in a shallow case_n_01 must already salted body_of_water_n_01 or Liebig . You will hold your omelet_n_01 , so as you wish to it , retention_n_01 hot dish_n_01 . A quart_n_01 of a half a lemon_n_03 . This dish_n_01 is good white crumb_n_03 of crumb_n_03 of carrot_n_02 ; then peel_n_02 them for five leaves and five flat in the meat_n_01 must exhibit_n_01 the same measure_n_02",
 				result.getVariants().get(1).toString());
 	}
 
@@ -163,5 +163,18 @@ public class DisambiguationResultTest {
 		
 		assertEquals(1, result.getSentences().get(2).getVariants().size());
 		assertEquals(3, result.getVariants().size());
+	}
+
+
+	@Test
+	public void testVariantsWithEntityTypeDisambiguation() {
+		String jsonResponse = "[{\"terms\": [{\"lemma\": \"Steve_Jobs\", \"word\": \"Steve_Jobs\", \"POS\": \"NNP\", \"meanings\": [{\"definition\": \"a human being\", \"meaning\": \"person_n_01\"}, {\"definition\": \"a workplace; as in the expression 'on the job'; \", \"meaning\": \"job_n_03\"}, {\"definition\": \"A person, institution or place name called 'Steve Jobs'\", \"meaning\": \"Steve_Jobs_n_01\"}]}], \"scores\": [0.33333340921091204, 0.33333334712849727, 0.33333324366059075]}]";
+		
+		result = DisambiguationResult.fromJson(jsonResponse);
+		
+		assertEquals(3, result.getSentences().get(0).getVariants().size());
+		assertEquals("Steve Jobs", result.getVariants().get(0).toString());
+		assertEquals("job_n_03", result.getVariants().get(1).toString());
+		assertEquals("Steve_Jobs_n_01", result.getVariants().get(2).toString());
 	}
 }

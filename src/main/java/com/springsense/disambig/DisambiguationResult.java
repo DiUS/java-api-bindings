@@ -12,416 +12,466 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 /**
- * A dismabiguation result. Returned from a meaningRecognitionAPI.recognize(...) call.
+ * A dismabiguation result. Returned from a meaningRecognitionAPI.recognize(...)
+ * call.
  */
 public class DisambiguationResult implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    private List<Sentence> sentences = null;
-    private List<Variant> variants = null;
+	private static final long serialVersionUID = 1L;
+	private List<Sentence> sentences = null;
+	private List<Variant> variants = null;
 
-    static DisambiguationResult fromJson(String json) {
-        List<Sentence> sentences = new Gson().fromJson(json, new TypeToken<List<Sentence>>() {
-        }.getType());
+	static DisambiguationResult fromJson(String json) {
+		List<Sentence> sentences = new Gson().fromJson(json,
+				new TypeToken<List<Sentence>>() {
+				}.getType());
 
-        DisambiguationResult result = new DisambiguationResult();
-        result.setSentences(sentences);
+		DisambiguationResult result = new DisambiguationResult();
+		result.setSentences(sentences);
 
-        return result;
-    }
+		return result;
+	}
 
-    private DisambiguationResult() {
-    }
+	private DisambiguationResult() {
+	}
 
-    /**
-     * Returns the sentences that comprise the disambiguation result
-     * @return A list of sentences that comprise the disambiguation result
-     */
-    public List<Sentence> getSentences() {
-        return sentences;
-    }
+	/**
+	 * Returns the sentences that comprise the disambiguation result
+	 * 
+	 * @return A list of sentences that comprise the disambiguation result
+	 */
+	public List<Sentence> getSentences() {
+		return sentences;
+	}
 
-    public void setSentences(List<Sentence> sentences) {
-        this.sentences = sentences;
-    }
-    
-    /**
-     * Returns the result as a list of variants, each having multiple variant sentences
-     * @return The result as a list of variants, each having multiple variant sentences
-     */
+	public void setSentences(List<Sentence> sentences) {
+		this.sentences = sentences;
+	}
+
+	/**
+	 * Returns the result as a list of variants, each having multiple variant
+	 * sentences
+	 * 
+	 * @return The result as a list of variants, each having multiple variant
+	 *         sentences
+	 */
 	public List<Variant> getVariants() {
-		if (variants == null) { 
+		if (variants == null) {
 			int maxNumberOfVariants = getHighestNumberOfVariants();
-			
-			VariantSentence[][] variantMatrix = new VariantSentence[maxNumberOfVariants][sentences.size()];
-			
+
+			VariantSentence[][] variantMatrix = new VariantSentence[maxNumberOfVariants][sentences
+					.size()];
+
 			for (int s = 0; s < sentences.size(); s++) {
 				Sentence sentence = sentences.get(s);
 				for (int v = 0; v < maxNumberOfVariants; v++) {
-					List<VariantSentence> sentenceVariants = sentence.getVariants();
+					List<VariantSentence> sentenceVariants = sentence
+							.getVariants();
 					int sizeOfSentenceVariants = sentenceVariants.size();
-					
-					VariantSentence variantSentence = sentenceVariants.get(v < sizeOfSentenceVariants ? v : 0);
-					
+
+					VariantSentence variantSentence = sentenceVariants
+							.get(v < sizeOfSentenceVariants ? v : 0);
+
 					variantMatrix[v][s] = variantSentence;
 				}
 			}
-			
+
 			variants = new ArrayList<Variant>(variantMatrix.length);
 			for (int v = 0; v < maxNumberOfVariants; v++) {
 				variants.add(new Variant(Arrays.asList(variantMatrix[v])));
 			}
-			
+
 		}
 		return Collections.unmodifiableList(variants);
 	}
 
 	/**
 	 * Returns the highest number of variants in the result sentences.
+	 * 
 	 * @return The highest number of variants in the result sentences.
 	 */
 	protected int getHighestNumberOfVariants() {
-		int maxNumberOfVariants = 0; 
+		int maxNumberOfVariants = 0;
 		for (Sentence sentence : sentences) {
 			List<VariantSentence> sentenceVariants = sentence.getVariants();
-			
-			maxNumberOfVariants = Math.max(maxNumberOfVariants, sentenceVariants.size());
+
+			maxNumberOfVariants = Math.max(maxNumberOfVariants,
+					sentenceVariants.size());
 		}
 		return maxNumberOfVariants;
 	}
 
-    /**
-     * A disambiguated sentence
-     */
-    public static class Sentence implements Serializable {
+	/**
+	 * A disambiguated sentence
+	 */
+	public static class Sentence implements Serializable {
 
-        /**
+		/**
          *
          */
-        private static final long serialVersionUID = 1L;
-        private double[] scores;
-        private List<Term> terms;
-        private List<VariantSentence> variants;
+		private static final long serialVersionUID = 1L;
+		private double[] scores;
+		private List<Term> terms;
+		private List<VariantSentence> variants;
 
-        protected Sentence() {
-        }
+		protected Sentence() {
+		}
 
-        /**
-         * Returns the scores for the various variants in the sentence
-         * @return An array of doubles containing the normalised (to 1.0) score breakdown of the potential disambiguation variants for the sentence
-         */
-        public double[] getScores() {
-            return scores;
-        }
+		/**
+		 * Returns the scores for the various variants in the sentence
+		 * 
+		 * @return An array of doubles containing the normalised (to 1.0) score
+		 *         breakdown of the potential disambiguation variants for the
+		 *         sentence
+		 */
+		public double[] getScores() {
+			return scores;
+		}
 
-        public void setScores(double[] scores) {
-            this.scores = scores;
-        }
+		public void setScores(double[] scores) {
+			this.scores = scores;
+		}
 
-        /**
-         * Returns the list of terms comprising the disambiguated sentence
-         * @return The list of terms comprising the disambiguated sentence
-         */
-        public List<Term> getTerms() {
-            return terms;
-        }
+		/**
+		 * Returns the list of terms comprising the disambiguated sentence
+		 * 
+		 * @return The list of terms comprising the disambiguated sentence
+		 */
+		public List<Term> getTerms() {
+			return terms;
+		}
 
-        public void setTerms(List<Term> terms) {
-            this.terms = terms;
-        }
+		public void setTerms(List<Term> terms) {
+			this.terms = terms;
+		}
 
-        /**
-         * Returns the individual disambiguated variants for the sentence
-         * @return A list of the individual disambiguated variants for the sentence
-         */
-        public List<VariantSentence> getVariants() {
-            if (variants == null) {
-                variants = calculateVariants();
-            }
-            return variants;
-        }
+		/**
+		 * Returns the individual disambiguated variants for the sentence
+		 * 
+		 * @return A list of the individual disambiguated variants for the
+		 *         sentence
+		 */
+		public List<VariantSentence> getVariants() {
+			if (variants == null) {
+				variants = calculateVariants();
+			}
+			return variants;
+		}
 
-        private List<VariantSentence> calculateVariants() {
-            int scoresCount = scores.length;
+		private List<VariantSentence> calculateVariants() {
+			int scoresCount = scores.length;
 			final int cardinality = Math.max(scoresCount, 1);
-            List<VariantSentence> variants = new ArrayList<VariantSentence>(cardinality);
-            for (int i = 0; i < cardinality; i++) {
-                variants.add(new VariantSentence(i < scoresCount ? scores[i] : 1.0, new ArrayList<ResolvedTerm>(getTerms().size())));
-            }
-            for (Term term : getTerms()) {
-                List<ResolvedTerm> resolvedTermsForTerm = termToResolvedTerms(term, cardinality);
-                for (int i = 0; i < cardinality; i++) {
-                    variants.get(i).getTerms().add(resolvedTermsForTerm.get(i));
-                }
-            }
-            return variants;
-        }
+			List<VariantSentence> variants = new ArrayList<VariantSentence>(
+					cardinality);
+			for (int i = 0; i < cardinality; i++) {
+				variants.add(new VariantSentence(i < scoresCount ? scores[i]
+						: 1.0, new ArrayList<ResolvedTerm>(getTerms().size())));
+			}
+			for (Term term : getTerms()) {
+				List<ResolvedTerm> resolvedTermsForTerm = termToResolvedTerms(
+						term, cardinality);
+				for (int i = 0; i < cardinality; i++) {
+					variants.get(i).getTerms().add(resolvedTermsForTerm.get(i));
+				}
+			}
+			return variants;
+		}
 
-        private List<ResolvedTerm> termToResolvedTerms(Term term, int cardinality) {
-            List<ResolvedTerm> resolvedTerms = new ArrayList<ResolvedTerm>(cardinality);
-            if (term.getMeanings().size() < 1) {
-                ResolvedTerm termWithNoMeanings = new ResolvedTerm(term, null, 1.0);
+		private List<ResolvedTerm> termToResolvedTerms(Term term,
+				int cardinality) {
+			List<ResolvedTerm> resolvedTerms = new ArrayList<ResolvedTerm>(
+					cardinality);
+			if (term.getMeanings().size() < 1) {
+				ResolvedTerm termWithNoMeanings = new ResolvedTerm(term, null,
+						1.0);
 
-                for (int i = 0; i < cardinality; i++) {
-                    resolvedTerms.add(termWithNoMeanings);
-                }
-            } else {
-                Map<String, ResolvedTerm> resolvedTermsByMeaning = new HashMap<String, ResolvedTerm>();
+				for (int i = 0; i < cardinality; i++) {
+					resolvedTerms.add(termWithNoMeanings);
+				}
+			} else {
+				Map<String, ResolvedTerm> resolvedTermsByMeaning = new HashMap<String, ResolvedTerm>();
 
-                for (int i = 0; i < cardinality; i++) {
-                    Meaning meaning = term.getMeanings().get(i % term.getMeanings().size());
-                    final String meaningToken = meaning.getMeaning();
-                    ResolvedTerm resolvedTerm = resolvedTermsByMeaning.get(meaningToken);
+				for (int i = 0; i < cardinality; i++) {
+					Meaning meaning = term.getMeanings().get(
+							i % term.getMeanings().size());
+					final String meaningToken = meaning.getMeaning();
+					ResolvedTerm resolvedTerm = resolvedTermsByMeaning
+							.get(meaningToken);
 
-                    if (resolvedTerm == null) {
-                        // New one
-                        resolvedTerm = new ResolvedTerm(term, meaning, getScores()[i]);
-                        resolvedTermsByMeaning.put(meaningToken, resolvedTerm);
-                    } else {
-                        resolvedTerm.setScore(resolvedTerm.getScore() + getScores()[i]);
-                    }
+					if (resolvedTerm == null) {
+						// New one
+						resolvedTerm = new ResolvedTerm(term, meaning,
+								getScores()[i]);
+						resolvedTermsByMeaning.put(meaningToken, resolvedTerm);
+					} else {
+						resolvedTerm.setScore(resolvedTerm.getScore()
+								+ getScores()[i]);
+					}
 
-                    resolvedTerms.add(resolvedTerm);
-                }
-            }
+					resolvedTerms.add(resolvedTerm);
+				}
+			}
 
-            return resolvedTerms;
-        }
+			return resolvedTerms;
+		}
 
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
 
-            for (Term t : getTerms()) {
-                sb.append(t.toString());
-                sb.append(' ');
-            }
+			for (Term t : getTerms()) {
+				sb.append(t.toString());
+				sb.append(' ');
+			}
 
-            return sb.toString().trim();
-        }
-    }
+			return sb.toString().trim();
+		}
+	}
 
-    /**
-     * A disambiguated variant sentence
-     */
-    public static class VariantSentence implements Serializable {
+	/**
+	 * A disambiguated variant sentence
+	 */
+	public static class VariantSentence implements Serializable {
 
-        /**
+		/**
          *
          */
-        private static final long serialVersionUID = 1L;
-        private double score;
-        private List<ResolvedTerm> terms;
+		private static final long serialVersionUID = 1L;
+		private double score;
+		private List<ResolvedTerm> terms;
 
-        protected VariantSentence(double score, List<ResolvedTerm> terms) {
-            this.score = score;
-            this.terms = terms;
-        }
+		protected VariantSentence(double score, List<ResolvedTerm> terms) {
+			this.score = score;
+			this.terms = terms;
+		}
 
-        /**
-         * Returns the probable score for the variant sentence
-         * @return A double which is the probable score for the variant sentence
-         */
-        public double getScore() {
-            return score;
-        }
+		/**
+		 * Returns the probable score for the variant sentence
+		 * 
+		 * @return A double which is the probable score for the variant sentence
+		 */
+		public double getScore() {
+			return score;
+		}
 
-        /**
-         * Returns the disambiguated terms comprising this variant
-         * @return A list of disambiguated terms comprising this variant
-         */
-        public List<ResolvedTerm> getTerms() {
-            return terms;
-        }
+		/**
+		 * Returns the disambiguated terms comprising this variant
+		 * 
+		 * @return A list of disambiguated terms comprising this variant
+		 */
+		public List<ResolvedTerm> getTerms() {
+			return terms;
+		}
 
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
 
-            for (ResolvedTerm term : getTerms()) {
-                sb.append(term.toString());
-                sb.append(' ');
-            }
+			for (ResolvedTerm term : getTerms()) {
+				sb.append(term.toString());
+				sb.append(' ');
+			}
 
-            return sb.toString().trim();
-        }
-    }
+			return sb.toString().trim();
+		}
+	}
 
-    /**
-     * Encapsulates resolved term, a specific meaning which is part of a specific variant of a disambiguated sentence
-     */
-    public static class ResolvedTerm implements Serializable {
+	/**
+	 * Encapsulates resolved term, a specific meaning which is part of a
+	 * specific variant of a disambiguated sentence
+	 */
+	public static class ResolvedTerm implements Serializable {
 
-        private static final long serialVersionUID = 1L;
-        private Term originalTerm;
-        private Meaning meaning;
-        private double score;
+		private static final long serialVersionUID = 1L;
+		private Term originalTerm;
+		private Meaning meaning;
+		private double score;
 
-        protected ResolvedTerm(Term originalTerm, Meaning meaning, double score) {
-            this.originalTerm = originalTerm;
-            this.meaning = meaning;
-            this.score = score;
-        }
+		protected ResolvedTerm(Term originalTerm, Meaning meaning, double score) {
+			this.originalTerm = originalTerm;
+			this.meaning = meaning;
+			this.score = score;
+		}
 
-        public String getWord() {
-            return getOriginalTerm().getWord();
-        }
+		public String getWord() {
+			return getOriginalTerm().getWord();
+		}
 
-        public Meaning getMeaning() {
-            return meaning;
-        }
+		public Meaning getMeaning() {
+			return meaning;
+		}
 
-        public Term getOriginalTerm() {
-            return originalTerm;
-        }
+		public Term getOriginalTerm() {
+			return originalTerm;
+		}
 
-        public double getScore() {
-            return score;
-        }
+		public double getScore() {
+			return score;
+		}
 
-        public void setScore(double score) {
-            this.score = score;
-        }
+		public void setScore(double score) {
+			this.score = score;
+		}
 
-        @Override
-        public String toString() {
-            if (getMeaning() != null) {
-                return getMeaning().getMeaning();
-            } else {
-                return getWord();
-            }
-        }
-    }
+		@Override
+		public String toString() {
+			if (getMeaning() != null) {
+				if (getMeaning().isEntityType()) {
+					return getWord().replaceAll("_", " ");
+				}
+				return getMeaning().getMeaning();
+			} else {
+				return getWord();
+			}
+		}
+	}
 
-    /**
-     * This class encapsulates a term, potentially with multiple meanings
-     */
-    public static class Term implements Serializable {
+	/**
+	 * This class encapsulates a term, potentially with multiple meanings
+	 */
+	public static class Term implements Serializable {
 
-        private static final long serialVersionUID = 1L;
-        private String lemma;
-        private String word;
-        private String POS;
-        private List<Meaning> meanings;
+		private static final long serialVersionUID = 1L;
+		private String lemma;
+		private String word;
+		private String POS;
+		private List<Meaning> meanings;
 
-        protected Term() {
-        }
+		protected Term() {
+		}
 
-        /**
-         * Returns the part-of-speech as determined by the API
-         * @return The part-of-speech identifier for the term
-         */
-        public String getPOS() {
-            return POS;
-        }
+		/**
+		 * Returns the part-of-speech as determined by the API
+		 * 
+		 * @return The part-of-speech identifier for the term
+		 */
+		public String getPOS() {
+			return POS;
+		}
 
-        protected void setPOS(String POS) {
-            this.POS = POS;
-        }
+		protected void setPOS(String POS) {
+			this.POS = POS;
+		}
 
-        /**
-         * Returns the lemmatized form of the term
-         * @return A string, the lemmatized form of the term
-         */
-        public String getLemma() {
-            return lemma;
-        }
+		/**
+		 * Returns the lemmatized form of the term
+		 * 
+		 * @return A string, the lemmatized form of the term
+		 */
+		public String getLemma() {
+			return lemma;
+		}
 
-        protected void setLemma(String lemma) {
-            this.lemma = lemma;
-        }
+		protected void setLemma(String lemma) {
+			this.lemma = lemma;
+		}
 
-        /**
-         * Returns the multiple potential meanings of the term if the API determined them
-         * @return A list of the multiple potential meanings for the term
-         */
-        public List<Meaning> getMeanings() {
-            return meanings;
-        }
+		/**
+		 * Returns the multiple potential meanings of the term if the API
+		 * determined them
+		 * 
+		 * @return A list of the multiple potential meanings for the term
+		 */
+		public List<Meaning> getMeanings() {
+			return meanings;
+		}
 
-        protected void setMeanings(List<Meaning> meanings) {
-            this.meanings = meanings;
-        }
+		protected void setMeanings(List<Meaning> meanings) {
+			this.meanings = meanings;
+		}
 
-        /**
-         * Returns the original form of the term
-         * @return The original form of the term
-         */
-        public String getWord() {
-            return word;
-        }
+		/**
+		 * Returns the original form of the term
+		 * 
+		 * @return The original form of the term
+		 */
+		public String getWord() {
+			return word;
+		}
 
-        protected void setWord(String word) {
-            this.word = word;
-        }
+		protected void setWord(String word) {
+			this.word = word;
+		}
 
-        @Override
-        public String toString() {
-            return getWord();
-        }
-    }
+		@Override
+		public String toString() {
+			return getWord();
+		}
+	}
 
-    /**
-     * One potential meaning of a term, with its definition
-     */
-    public static class Meaning implements Serializable {
+	/**
+	 * One potential meaning of a term, with its definition
+	 */
+	public static class Meaning implements Serializable {
 
-        private static final long serialVersionUID = 1L;
-        private String definition;
-        private String meaning;
+		private static final long serialVersionUID = 1L;
+		private String definition;
+		private String meaning;
 
-        protected Meaning() {
-        }
+		protected Meaning() {
+		}
 
-        /**
-         * Returns the definition of the meaning, according to WordNet
-         * @return The definition of the meaning, according to WordNet
-         */
-        public String getDefinition() {
-            return definition;
-        }
+		/**
+		 * Returns the definition of the meaning, according to WordNet
+		 * 
+		 * @return The definition of the meaning, according to WordNet
+		 */
+		public String getDefinition() {
+			return definition;
+		}
 
-        protected void setDefinition(String definition) {
-            this.definition = definition;
-        }
+		protected void setDefinition(String definition) {
+			this.definition = definition;
+		}
 
-        /**
-         * Returns the meaning token for the meaning, according to the WordNet conventions
-         * @return The meaning token for the meaning, according to the WordNet conventions
-         */
-        public String getMeaning() {
-            return meaning;
-        }
+		/**
+		 * Returns the meaning token for the meaning, according to the WordNet
+		 * conventions
+		 * 
+		 * @return The meaning token for the meaning, according to the WordNet
+		 *         conventions
+		 */
+		public String getMeaning() {
+			return meaning;
+		}
 
-        protected void setMeaning(String meaning) {
-            this.meaning = meaning;
-        }
-    }
+		protected void setMeaning(String meaning) {
+			this.meaning = meaning;
+		}
 
-    public static class Variant implements Serializable {
-    	private static final long serialVersionUID = 1L;
-    	
-    	List<VariantSentence> sentences;
-    	
-    	protected Variant(List<VariantSentence> sentences) {
+		public boolean isEntityType() {
+			return (("person_n_01".equals(getMeaning()))
+					|| ("association_n_01".equals(getMeaning())) || ("location_n_01"
+					.equals(getMeaning())));
+
+		}
+
+	}
+
+	public static class Variant implements Serializable {
+		private static final long serialVersionUID = 1L;
+
+		List<VariantSentence> sentences;
+
+		protected Variant(List<VariantSentence> sentences) {
 			super();
 			this.sentences = sentences;
 		}
 
 		public List<VariantSentence> getSentences() {
 			return Collections.unmodifiableList(sentences);
-    	}
-		
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
+		}
 
-            for (VariantSentence s : getSentences()) {
-                sb.append(s.toString());
-                sb.append(' ');
-            }
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
 
-            return sb.toString().trim();
-        }		
-    }
+			for (VariantSentence s : getSentences()) {
+				sb.append(s.toString());
+				sb.append(' ');
+			}
+
+			return sb.toString().trim();
+		}
+	}
 }
