@@ -335,7 +335,15 @@ public class DisambiguationResult implements Serializable {
 		private String POS;
 		private List<Meaning> meanings;
 
-		public Term() {
+		protected Term() {
+		}
+
+		public Term(String lemma, String word, String POS, List<Meaning> meanings) {
+			super();
+			this.lemma = lemma;
+			this.word = word;
+			this.POS = POS;
+			this.meanings = meanings;
 		}
 
 		/**
@@ -406,7 +414,13 @@ public class DisambiguationResult implements Serializable {
 		private String definition;
 		private String meaning;
 
-		public Meaning() {
+		protected Meaning() {
+		}
+
+		public Meaning(String meaning, String definition) {
+			super();
+			this.definition = definition;
+			this.meaning = meaning;
 		}
 
 		/**
