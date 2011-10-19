@@ -106,15 +106,13 @@ public class DisambiguationResult implements Serializable {
 	 */
 	public static class Sentence implements Serializable {
 
-		/**
-         *
-         */
 		private static final long serialVersionUID = 1L;
+		
 		private double[] scores;
 		private List<Term> terms;
 		private List<VariantSentence> variants;
 
-		protected Sentence() {
+		public Sentence() {
 		}
 
 		/**
@@ -337,7 +335,7 @@ public class DisambiguationResult implements Serializable {
 		private String POS;
 		private List<Meaning> meanings;
 
-		protected Term() {
+		public Term() {
 		}
 
 		/**
@@ -408,7 +406,7 @@ public class DisambiguationResult implements Serializable {
 		private String definition;
 		private String meaning;
 
-		protected Meaning() {
+		public Meaning() {
 		}
 
 		/**
