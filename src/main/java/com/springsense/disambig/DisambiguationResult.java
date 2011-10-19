@@ -32,7 +32,12 @@ public class DisambiguationResult implements Serializable {
 		return result;
 	}
 
-	private DisambiguationResult() {
+	protected DisambiguationResult() {
+	}
+	
+	public DisambiguationResult(List<Sentence> sentences) {
+		super();
+		this.sentences = sentences;
 	}
 
 	/**
