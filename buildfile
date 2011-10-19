@@ -10,6 +10,7 @@ COPYRIGHT = "(C) Copyright 2011 SpringSense Trust. All rights reserved. Licensed
 
 # Specify Maven 2.0 remote repositories here, like this:
 repositories.remote << "http://www.ibiblio.org/maven2/"
+repositories.release_to = 'sftp://artifacts:repository@192.168.0.96/home/artifacts/repository'
 
 desc "The Java_api_bindings project"
 define "java_api_bindings" do
