@@ -337,17 +337,21 @@ public class DisambiguationResult implements Serializable {
 		private static final long serialVersionUID = 1L;
 		private String lemma;
 		private String word;
+		private String term;
 		private String POS;
+		private int offset;
 		private List<Meaning> meanings;
 
 		protected Term() {
 		}
 
-		public Term(String lemma, String word, String POS, List<Meaning> meanings) {
+		public Term(String lemma, String word, String POS, String term, int offset, List<Meaning> meanings) {
 			super();
 			this.lemma = lemma;
 			this.word = word;
 			this.POS = POS;
+			this.term = term;
+			this.offset = offset;
 			this.meanings = meanings;
 		}
 
@@ -395,6 +399,32 @@ public class DisambiguationResult implements Serializable {
 		 * Returns the original form of the term
 		 * 
 		 * @return The original form of the term
+		 */
+		public String getTerm() {
+			return term;
+		}
+
+		protected void setTerm(String term) {
+			this.term = term;
+		}
+
+		/**
+		 * Returns the offset in the original text of the term
+		 * 
+		 * @return The offset of the term
+		 */
+		public int getTermOffset() {
+			return offset;
+		}
+
+		protected void setTermOffset(int offset) {
+			this.offset = offset;
+		}
+
+		/**
+		 * Returns the form of the term used by the meaning recognition engine
+		 * 
+		 * @return The form of the term used for meaning recognition
 		 */
 		public String getWord() {
 			return word;
