@@ -1,10 +1,7 @@
 package com.springsense.disambig;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
-import java.io.BufferedInputStream;
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -18,7 +15,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MeaningRecognitionAPICachePersistenceTest {
+public class CachedMeaningRecognitionAPIPersistenceTest {
 
 	private MeaningRecognitionAPI api;
 
@@ -45,7 +42,7 @@ public class MeaningRecognitionAPICachePersistenceTest {
 	}
 
 	private MeaningRecognitionAPI createApiInstance() {
-		return new MeaningRecognitionAPI("no url", "fake id", "fake password",
+		return new CachedMeaningRecognitionAPI("no url", "fake id", "fake password",
 				null, 10, 4, tempCacheDir) {
 			protected String callRestfulWebService(
 					Map<String, String> parameters, String body)
@@ -91,7 +88,7 @@ public class MeaningRecognitionAPICachePersistenceTest {
 	@Test(expected = RuntimeException.class)
 	public void constructorShouldThrowExceptionIfCacheStoreDirIsNotADir()
 			throws Exception {
-		new MeaningRecognitionAPI("no url", "fake id", "fake password", null,
+		new CachedMeaningRecognitionAPI("no url", "fake id", "fake password", null,
 				10, 4, File.createTempFile("cache", "ignore"));
 	}
 

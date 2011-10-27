@@ -3,14 +3,13 @@ package com.springsense.disambig;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class MeaningRecognitionAPICacheTest {
+public class CachedMeaningRecognitionAPITest {
 
 	private MeaningRecognitionAPI api;
 
@@ -21,7 +20,7 @@ public class MeaningRecognitionAPICacheTest {
 	@Before
 	public void setUp() throws IOException {
 
-		api = new MeaningRecognitionAPI("no url", "fake id", "fake password",
+		api = new CachedMeaningRecognitionAPI("no url", "fake id", "fake password",
 				null, 10, 4, null) {
 			protected String callRestfulWebService(
 					Map<String, String> parameters, String body)
