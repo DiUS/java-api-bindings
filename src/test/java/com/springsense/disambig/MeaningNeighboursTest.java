@@ -38,4 +38,11 @@ public class MeaningNeighboursTest {
         assertArrayEquals(expectedNeighboursForZurvanism, meaningNeighbours.getNeighboursForMeaning("zurvanism_n_02").toArray());
     }
 
+    @Test
+    public void testReplaceAll() {
+    	assertEquals("TAFESA Vocational units in Small Business - Open Universities Australia",
+    			"TAFESA?Vocational units in Small Business - Open Universities Australia".replaceAll("\\?", " "));
+    	assertEquals("Monash Postgraduate units in Primary Education - Open Universities Australia",
+    			"Monash?Postgraduate units in Primary Education - Open Universities Australia".replaceAll("\\?", " "));
+    }
 }

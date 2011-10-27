@@ -47,7 +47,7 @@ public class CachedMeaningRecognitionAPI extends MeaningRecognitionAPI {
 	 */
 	public CachedMeaningRecognitionAPI(String url, String customerId, String apiKey, Proxy proxy, int maxCacheSize, int expectedNumberOfConcurrentThreads,
 			File cacheStoreDir) {
-		super(url, customerId, apiKey, proxy);
+		super(url, customerId, apiKey, proxy, true);
 
 		cache = buildLRUCache(maxCacheSize, expectedNumberOfConcurrentThreads);
 		this.cacheStoreDir = cacheStoreDir;

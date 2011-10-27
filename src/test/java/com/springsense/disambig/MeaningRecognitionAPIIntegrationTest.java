@@ -12,7 +12,7 @@ public class MeaningRecognitionAPIIntegrationTest {
 
     @Before
     public void setUp() {
-        api = new MeaningRecognitionAPI("http://api.dev.springsense.com/disambiguate", "customer id", "api key");
+        api = new MeaningRecognitionAPI("http://api.dev.springsense.com/disambiguate", "customer id", "api key", null, false);
     }
 
     @After

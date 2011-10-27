@@ -22,6 +22,7 @@ public class MeaningRecognitionAPI {
 	private String customerId;
 	private String apiKey;
 	private Proxy proxy;
+	private boolean urlEncodeBody;
 
 	private int numberOfRetries = DEFAULT_NUMBER_OF_RETRIES;
 	private long waitBetweenRetries = DEFAULT_WAIT_BETWEEN_RETRIES;
@@ -39,7 +40,7 @@ public class MeaningRecognitionAPI {
 	 *            Your secret API key
 	 */
 	public MeaningRecognitionAPI(String url, String customerId, String apiKey) {
-		this(url, customerId, apiKey, null);
+		this(url, customerId, apiKey, null, true);
 	}
 
 	/**
@@ -55,12 +56,14 @@ public class MeaningRecognitionAPI {
 	 *            Your secret API key
 	 * @param proxy
 	 *            The Proxy to use for communications
+	 * @param urlEncodeBody TODO
 	 */
-	public MeaningRecognitionAPI(String url, String customerId, String apiKey, Proxy proxy) {
+	public MeaningRecognitionAPI(String url, String customerId, String apiKey, Proxy proxy, boolean urlEncodeBody) {
 		this.url = url;
 		this.customerId = customerId;
 		this.apiKey = apiKey;
 		this.proxy = proxy;
+		this.urlEncodeBody = urlEncodeBody;
 	}
 
 	String getApiKey() {
@@ -169,7 +172,7 @@ public class MeaningRecognitionAPI {
 
 		// Send query
 		PrintStream ps = new PrintStream(connection.getOutputStream());
-		ps.print(body);
+		ps.print(urlEncodeBody ? URLEncoder.encode(body, "UTF-8") : body);
 		ps.close();
 
 		// Retrieve result
