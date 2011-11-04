@@ -29,6 +29,7 @@ define "java_api_bindings" do
   MOCKITO = artifact("org.mockito:mockito-all:jar:1.8.5")
        
   compile.with GSON, GUAVA, OPENCSV
+  compile.using :target => "1.5"
   test.compile.with JUNIT4, HAMCREST, MOCKITO
   
   package(:jar)
