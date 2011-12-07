@@ -27,10 +27,11 @@ define "java_api_bindings" do
   JUNIT4 = artifact("junit:junit:jar:4.8.2")
   HAMCREST = artifact("org.hamcrest:hamcrest-core:jar:1.2.1")
   MOCKITO = artifact("org.mockito:mockito-all:jar:1.8.5")
-       
+  COMMONS_IO = artifact("commons-io:commons-io:jar:2.0.1")
+
   compile.with GSON, GUAVA, OPENCSV
   compile.using :target => "1.5"
-  test.compile.with JUNIT4, HAMCREST, MOCKITO
+  test.compile.with JUNIT4, HAMCREST, MOCKITO, COMMONS_IO
   
   package(:jar)
 end

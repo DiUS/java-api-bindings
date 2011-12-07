@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +23,8 @@ public class DisambiguationResult implements Serializable {
 	private List<Variant> variants = null;
 
 	static DisambiguationResult fromJson(String json) {
-		List<Sentence> sentences = new Gson().fromJson(json,
-				new TypeToken<List<Sentence>>() {
-				}.getType());
+		List<Sentence> sentences = new Gson().fromJson(json, new TypeToken<List<Sentence>>() {
+		}.getType());
 
 		DisambiguationResult result = new DisambiguationResult();
 		result.setSentences(sentences);
@@ -34,7 +34,7 @@ public class DisambiguationResult implements Serializable {
 
 	protected DisambiguationResult() {
 	}
-	
+
 	public DisambiguationResult(List<Sentence> sentences) {
 		super();
 		this.sentences = sentences;
@@ -64,18 +64,15 @@ public class DisambiguationResult implements Serializable {
 		if (variants == null) {
 			int maxNumberOfVariants = getHighestNumberOfVariants();
 
-			VariantSentence[][] variantMatrix = new VariantSentence[maxNumberOfVariants][sentences
-					.size()];
+			VariantSentence[][] variantMatrix = new VariantSentence[maxNumberOfVariants][sentences.size()];
 
 			for (int s = 0; s < sentences.size(); s++) {
 				Sentence sentence = sentences.get(s);
 				for (int v = 0; v < maxNumberOfVariants; v++) {
-					List<VariantSentence> sentenceVariants = sentence
-							.getVariants();
+					List<VariantSentence> sentenceVariants = sentence.getVariants();
 					int sizeOfSentenceVariants = sentenceVariants.size();
 
-					VariantSentence variantSentence = sentenceVariants
-							.get(v < sizeOfSentenceVariants ? v : 0);
+					VariantSentence variantSentence = sentenceVariants.get(v < sizeOfSentenceVariants ? v : 0);
 
 					variantMatrix[v][s] = variantSentence;
 				}
@@ -100,10 +97,39 @@ public class DisambiguationResult implements Serializable {
 		for (Sentence sentence : sentences) {
 			List<VariantSentence> sentenceVariants = sentence.getVariants();
 
-			maxNumberOfVariants = Math.max(maxNumberOfVariants,
-					sentenceVariants.size());
+			maxNumberOfVariants = Math.max(maxNumberOfVariants, sentenceVariants.size());
 		}
 		return maxNumberOfVariants;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((sentences == null) ? 0 : sentences.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		DisambiguationResult other = (DisambiguationResult) obj;
+		if (sentences == null) {
+			if (other.sentences != null) {
+				return false;
+			}
+		} else if (!sentences.equals(other.sentences)) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -112,7 +138,7 @@ public class DisambiguationResult implements Serializable {
 	public static class Sentence implements Serializable {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		private double[] scores;
 		private List<Term> terms;
 		private List<VariantSentence> variants;
@@ -164,15 +190,12 @@ public class DisambiguationResult implements Serializable {
 		private List<VariantSentence> calculateVariants() {
 			int scoresCount = scores.length;
 			final int cardinality = Math.max(scoresCount, 1);
-			List<VariantSentence> variants = new ArrayList<VariantSentence>(
-					cardinality);
+			List<VariantSentence> variants = new ArrayList<VariantSentence>(cardinality);
 			for (int i = 0; i < cardinality; i++) {
-				variants.add(new VariantSentence(i < scoresCount ? scores[i]
-						: 1.0, new ArrayList<ResolvedTerm>(getTerms().size())));
+				variants.add(new VariantSentence(i < scoresCount ? scores[i] : 1.0, new ArrayList<ResolvedTerm>(getTerms().size())));
 			}
 			for (Term term : getTerms()) {
-				List<ResolvedTerm> resolvedTermsForTerm = termToResolvedTerms(
-						term, cardinality);
+				List<ResolvedTerm> resolvedTermsForTerm = termToResolvedTerms(term, cardinality);
 				for (int i = 0; i < cardinality; i++) {
 					variants.get(i).getTerms().add(resolvedTermsForTerm.get(i));
 				}
@@ -180,13 +203,10 @@ public class DisambiguationResult implements Serializable {
 			return variants;
 		}
 
-		private List<ResolvedTerm> termToResolvedTerms(Term term,
-				int cardinality) {
-			List<ResolvedTerm> resolvedTerms = new ArrayList<ResolvedTerm>(
-					cardinality);
+		private List<ResolvedTerm> termToResolvedTerms(Term term, int cardinality) {
+			List<ResolvedTerm> resolvedTerms = new ArrayList<ResolvedTerm>(cardinality);
 			if (term.getMeanings().size() < 1) {
-				ResolvedTerm termWithNoMeanings = new ResolvedTerm(term, null,
-						1.0);
+				ResolvedTerm termWithNoMeanings = new ResolvedTerm(term, null, 1.0);
 
 				for (int i = 0; i < cardinality; i++) {
 					resolvedTerms.add(termWithNoMeanings);
@@ -195,20 +215,16 @@ public class DisambiguationResult implements Serializable {
 				Map<String, ResolvedTerm> resolvedTermsByMeaning = new HashMap<String, ResolvedTerm>();
 
 				for (int i = 0; i < cardinality; i++) {
-					Meaning meaning = term.getMeanings().get(
-							i % term.getMeanings().size());
+					Meaning meaning = term.getMeanings().get(i % term.getMeanings().size());
 					final String meaningToken = meaning.getMeaning();
-					ResolvedTerm resolvedTerm = resolvedTermsByMeaning
-							.get(meaningToken);
+					ResolvedTerm resolvedTerm = resolvedTermsByMeaning.get(meaningToken);
 
 					if (resolvedTerm == null) {
 						// New one
-						resolvedTerm = new ResolvedTerm(term, meaning,
-								getScores()[i]);
+						resolvedTerm = new ResolvedTerm(term, meaning, getScores()[i]);
 						resolvedTermsByMeaning.put(meaningToken, resolvedTerm);
 					} else {
-						resolvedTerm.setScore(resolvedTerm.getScore()
-								+ getScores()[i]);
+						resolvedTerm.setScore(resolvedTerm.getScore() + getScores()[i]);
 					}
 
 					resolvedTerms.add(resolvedTerm);
@@ -229,6 +245,41 @@ public class DisambiguationResult implements Serializable {
 
 			return sb.toString().trim();
 		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + Arrays.hashCode(scores);
+			result = prime * result + ((terms == null) ? 0 : terms.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			Sentence other = (Sentence) obj;
+			if (!Arrays.equals(scores, other.scores)) {
+				return false;
+			}
+			if (terms == null) {
+				if (other.terms != null) {
+					return false;
+				}
+			} else if (!terms.equals(other.terms)) {
+				return false;
+			}
+			return true;
+		}
+
 	}
 
 	/**
@@ -438,6 +489,90 @@ public class DisambiguationResult implements Serializable {
 		public String toString() {
 			return getWord();
 		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((POS == null) ? 0 : POS.hashCode());
+			result = prime * result + ((lemma == null) ? 0 : lemma.hashCode());
+			result = prime * result + ((meanings == null) ? 0 : meanings.hashCode());
+			result = prime * result + offset;
+			result = prime * result + ((term == null) ? 0 : term.hashCode());
+			result = prime * result + ((word == null) ? 0 : word.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			Term other = (Term) obj;
+			if (POS == null) {
+				if (other.POS != null) {
+					return false;
+				}
+			} else if (!POS.equals(other.POS)) {
+				return false;
+			}
+			if (lemma == null) {
+				if (other.lemma != null) {
+					return false;
+				}
+			} else if (!lemma.equals(other.lemma)) {
+				return false;
+			}
+			if (meanings == null) {
+				if (other.meanings != null) {
+					return false;
+				}
+			} else {
+				List<Meaning> sortedMeanings = new ArrayList<Meaning>(meanings);
+				List<Meaning> sortedOtherMeanings = new ArrayList<Meaning>(other.meanings);
+				
+				Comparator<Meaning> meaningComp = new Comparator<Meaning>() {
+
+					@Override
+					public int compare(Meaning left, Meaning right) {
+						return left.getMeaning().compareTo(right.getMeaning());
+					}
+					
+				};
+				
+				Collections.sort(sortedMeanings, meaningComp);
+				Collections.sort(sortedOtherMeanings, meaningComp);
+				
+				if (!sortedMeanings.equals(sortedOtherMeanings)) {
+					return false;
+				}
+			}
+			if (offset != other.offset) {
+				return false;
+			}
+			if (term == null) {
+				if (other.term != null) {
+					return false;
+				}
+			} else if (!term.equals(other.term)) {
+				return false;
+			}
+			if (word == null) {
+				if (other.word != null) {
+					return false;
+				}
+			} else if (!word.equals(other.word)) {
+				return false;
+			}
+			return true;
+		}
+
 	}
 
 	/**
@@ -487,10 +622,46 @@ public class DisambiguationResult implements Serializable {
 		}
 
 		public boolean isEntityType() {
-			return (("person_n_01".equals(getMeaning()))
-					|| ("association_n_01".equals(getMeaning())) || ("location_n_01"
-					.equals(getMeaning())));
+			return (("person_n_01".equals(getMeaning())) || ("association_n_01".equals(getMeaning())) || ("location_n_01".equals(getMeaning())));
 
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((definition == null) ? 0 : definition.hashCode());
+			result = prime * result + ((meaning == null) ? 0 : meaning.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			Meaning other = (Meaning) obj;
+			if (definition == null) {
+				if (other.definition != null) {
+					return false;
+				}
+			} else if (!definition.equals(other.definition)) {
+				return false;
+			}
+			if (meaning == null) {
+				if (other.meaning != null) {
+					return false;
+				}
+			} else if (!meaning.equals(other.meaning)) {
+				return false;
+			}
+			return true;
 		}
 
 	}
