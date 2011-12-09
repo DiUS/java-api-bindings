@@ -267,9 +267,17 @@ public class DisambiguationResult implements Serializable {
 				return false;
 			}
 			Sentence other = (Sentence) obj;
-			if (!Arrays.equals(scores, other.scores)) {
+			if (scores.length != other.scores.length) {
 				return false;
 			}
+			
+			double tolerance = 0.001;
+			for (int i = 0; i < scores.length; i++) {
+				if (Math.abs(scores[i] - other.scores[i]) > tolerance) {
+					return false;
+				}
+			}
+
 			if (terms == null) {
 				if (other.terms != null) {
 					return false;
