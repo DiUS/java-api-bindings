@@ -40,6 +40,17 @@ public class DisambiguationResult implements Serializable {
 		this.sentences = sentences;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		for (Sentence s : getSentences()) {
+			sb.append(s.toString());
+			sb.append('\n');
+		}
+
+		return sb.toString().trim();
+	}
 	/**
 	 * Returns the sentences that comprise the disambiguation result
 	 * 
@@ -234,16 +245,10 @@ public class DisambiguationResult implements Serializable {
 			return resolvedTerms;
 		}
 
+		
 		@Override
 		public String toString() {
-			StringBuilder sb = new StringBuilder();
-
-			for (Term t : getTerms()) {
-				sb.append(t.toString());
-				sb.append(' ');
-			}
-
-			return sb.toString().trim();
+			return String.format("'sentence':['terms':%s,'scores':%s]", terms, Arrays.toString(scores));
 		}
 
 		@Override
@@ -493,10 +498,6 @@ public class DisambiguationResult implements Serializable {
 			this.word = word;
 		}
 
-		@Override
-		public String toString() {
-			return getWord();
-		}
 
 		@Override
 		public int hashCode() {
@@ -509,6 +510,11 @@ public class DisambiguationResult implements Serializable {
 			result = prime * result + ((term == null) ? 0 : term.hashCode());
 			result = prime * result + ((word == null) ? 0 : word.hashCode());
 			return result;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("'term':{word:'%s', term:'%s', lemma:'%s', POS:'%s', meanings:%s, offset:%s}", word, term, lemma, POS, meanings, offset);
 		}
 
 		@Override
@@ -641,6 +647,11 @@ public class DisambiguationResult implements Serializable {
 			result = prime * result + ((definition == null) ? 0 : definition.hashCode());
 			result = prime * result + ((meaning == null) ? 0 : meaning.hashCode());
 			return result;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("'meaning':{'meaning':'%s','definition':'%s'}", meaning, definition);
 		}
 
 		@Override

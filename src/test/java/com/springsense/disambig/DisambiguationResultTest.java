@@ -134,7 +134,7 @@ public class DisambiguationResultTest {
 				singleMeaningVariant.getTerms().size() - 2);
 
 		assertEquals(
-				"Send them into another one can make little feculina flour .",
+				"'sentence':['terms':['term':{word:'Send', term:'null', lemma:'Send', POS:'VB', meanings:[], offset:0}, 'term':{word:'them', term:'null', lemma:'them', POS:'PRP', meanings:[], offset:0}, 'term':{word:'into', term:'null', lemma:'into', POS:'IN', meanings:[], offset:0}, 'term':{word:'another', term:'null', lemma:'another', POS:'DT', meanings:[], offset:0}, 'term':{word:'one', term:'null', lemma:'one', POS:'CD', meanings:[], offset:0}, 'term':{word:'can', term:'null', lemma:'can', POS:'MD', meanings:[], offset:0}, 'term':{word:'make', term:'null', lemma:'make', POS:'VB', meanings:[], offset:0}, 'term':{word:'little', term:'null', lemma:'little', POS:'JJ', meanings:[], offset:0}, 'term':{word:'feculina', term:'null', lemma:'feculina', POS:'NN', meanings:[], offset:0}, 'term':{word:'flour', term:'null', lemma:'flour', POS:'NN', meanings:['meaning':{'meaning':'flour_n_01','definition':'fine powdery foodstuff obtained by grinding and sifting the meal of a cereal grain'}], offset:0}, 'term':{word:'.', term:'null', lemma:'.', POS:'.', meanings:[], offset:0}],'scores':[1.0]]",
 				singleMeaningsSentence.toString());
 		assertEquals(1, singleMeaningVariants.size());
 
