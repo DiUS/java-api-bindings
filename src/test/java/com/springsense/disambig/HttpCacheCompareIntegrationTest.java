@@ -25,6 +25,7 @@ public class HttpCacheCompareIntegrationTest {
 	private int totalQueriesMade = 0;
 	private int totalSentenceCount = 0;
 	private long totalDirectTimeMs = 0;
+	private long totalPrimingTimeMs = 0;
 	private long totalCachedTimeMs = 0;
 
 	@Before
@@ -46,8 +47,10 @@ public class HttpCacheCompareIntegrationTest {
 
 		System.out.printf("Total Queries: %d\n", totalQueriesMade);
 		System.out.printf("Total Sentences: %d\n", totalSentenceCount);
-		System.out.printf("Total Direct Time: %dms.\tDirect QPS: %g q/s.\tDirect Sentences p/sec: %g\n", totalDirectTimeMs, (double) totalQueriesMade
+		System.out.printf("Total Direct Time: %dms.\tDirect QpS: %g q/s.\tDirect Sentences p/sec: %g\n", totalDirectTimeMs, (double) totalQueriesMade
 				/ ((double) totalDirectTimeMs / 1000.0), (double) totalSentenceCount / ((double) totalDirectTimeMs / 1000.0));
+		System.out.printf("Total Priming Time: %dms.\tPriming QpS: %g q/s.\tPriming Sentences p/sec: %g\n", totalPrimingTimeMs, (double) totalQueriesMade
+				/ ((double) totalPrimingTimeMs / 1000.0), (double) totalSentenceCount / ((double) totalPrimingTimeMs / 1000.0));
 		System.out.printf("Total Cached Time: %dms.\tCached QpS: %g q/s.\tCached Sentences p/sec: %g\n", totalCachedTimeMs, (double) totalQueriesMade
 				/ ((double) totalCachedTimeMs / 1000.0), (double) totalSentenceCount / ((double) totalCachedTimeMs / 1000.0));
 	}
@@ -113,13 +116,16 @@ public class HttpCacheCompareIntegrationTest {
 		DisambiguationResult directResult1 = directApi.recognize(textToRecognize);
 		long afterDirectMs = System.currentTimeMillis();
 
+		long beforePrimingMs = System.currentTimeMillis();
 		DisambiguationResult primeCacheResult1 = cachedApi.recognize(textToRecognize);
+		long afterPrimingMs = System.currentTimeMillis();
 
 		long beforeCachedMs = System.currentTimeMillis();
 		DisambiguationResult cachedResult2 = cachedApi.recognize(textToRecognize);
 		long afterCachedMs = System.currentTimeMillis();
 
 		totalDirectTimeMs += (afterDirectMs - beforeDirectMs);
+		totalPrimingTimeMs += (afterPrimingMs - beforePrimingMs);
 		totalCachedTimeMs += (afterCachedMs - beforeCachedMs);
 		totalQueriesMade++;
 

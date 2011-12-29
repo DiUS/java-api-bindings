@@ -364,6 +364,10 @@ public class DisambiguationResult implements Serializable {
 			return getOriginalTerm().getWord();
 		}
 
+		public String getTerm() {
+			return getOriginalTerm().getTerm();
+		}
+		
 		public Meaning getMeaning() {
 			return meaning;
 		}
@@ -384,11 +388,11 @@ public class DisambiguationResult implements Serializable {
 		public String toString() {
 			if (getMeaning() != null) {
 				if (getMeaning().isEntityType()) {
-					return getWord().replaceAll("_", " ");
+					return getTerm();
 				}
 				return getMeaning().getMeaning();
 			} else {
-				return getWord();
+				return getTerm();
 			}
 		}
 	}
