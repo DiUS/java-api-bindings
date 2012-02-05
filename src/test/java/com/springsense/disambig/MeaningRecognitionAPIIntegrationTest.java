@@ -12,7 +12,7 @@ public class MeaningRecognitionAPIIntegrationTest {
 
 	@Before
 	public void setUp() {
-		api = new MeaningRecognitionAPI("http://prod.springsense.com:8080/disambiguate", "customer id", "api key", null, true);
+		api = new MeaningRecognitionAPI("http://api.springsense.com/disambiguate", "customer id", "api key", null, true);
 	}
 
 	@After
@@ -21,7 +21,7 @@ public class MeaningRecognitionAPIIntegrationTest {
 
 	@Test
 	public void testConstructor() {
-		assertEquals("http://prod.springsense.com:8080/disambiguate", api.getUrl());
+		assertEquals("http://api.springsense.com/disambiguate", api.getUrl());
 		assertEquals("customer id", api.getCustomerId());
 		assertEquals("api key", api.getApiKey());
 	}
