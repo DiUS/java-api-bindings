@@ -19,10 +19,9 @@ public class MeaningRecognitionAPI {
 	private static final int DEFAULT_WAIT_BETWEEN_RETRIES = 2000;
 
 	private String url;
-	private String customerId;
-	private String apiKey;
+	private String appId;
+	private String appKey;
 	private Proxy proxy;
-	private boolean urlEncodeBody;
 
 	private int numberOfRetries = DEFAULT_NUMBER_OF_RETRIES;
 	private long waitBetweenRetries = DEFAULT_WAIT_BETWEEN_RETRIES;
@@ -33,14 +32,14 @@ public class MeaningRecognitionAPI {
 	 * 
 	 * @param url
 	 *            The end-point URL to use. Most likely
-	 *            http://api.springsense.com/disambiguate
-	 * @param customerId
-	 *            Your customer id, get yours at http://springsense.com/api
-	 * @param apiKey
-	 *            Your secret API key
+	 *            http://api.springsense.com:8081/v1/disambiguate
+	 * @param appId
+	 *            Your application id, get yours at http://springsense.com/api
+	 * @param appKey
+	 *            Your secret application key
 	 */
-	public MeaningRecognitionAPI(String url, String customerId, String apiKey) {
-		this(url, customerId, apiKey, null, true);
+	public MeaningRecognitionAPI(String url, String appId, String appKey) {
+		this(url, appId, appKey, null);
 	}
 
 	/**
@@ -49,29 +48,27 @@ public class MeaningRecognitionAPI {
 	 * 
 	 * @param url
 	 *            The end-point URL to use. Most likely
-	 *            http://api.springsense.com/disambiguate
-	 * @param customerId
-	 *            Your customer id, get yours at http://springsense.com/api
-	 * @param apiKey
-	 *            Your secret API key
+	 *            http://api.springsense.com:8081/v1/disambiguate
+	 * @param appId
+	 *            Your application id, get yours at http://springsense.com/api
+	 * @param appKey
+	 *            Your secret application key
 	 * @param proxy
-	 *            The Proxy to use for communications
-	 * @param urlEncodeBody TODO
+	 *            The Proxy to use for communications, optional.
 	 */
-	public MeaningRecognitionAPI(String url, String customerId, String apiKey, Proxy proxy, boolean urlEncodeBody) {
+	public MeaningRecognitionAPI(String url, String appId, String appKey, Proxy proxy) {
 		this.url = url;
-		this.customerId = customerId;
-		this.apiKey = apiKey;
+		this.appId = appId;
+		this.appKey = appKey;
 		this.proxy = proxy;
-		this.urlEncodeBody = urlEncodeBody;
 	}
 
-	String getApiKey() {
-		return apiKey;
+	String getAppKey() {
+		return appKey;
 	}
 
-	String getCustomerId() {
-		return customerId;
+	String getAppId() {
+		return appId;
 	}
 
 	String getUrl() {
@@ -132,11 +129,11 @@ public class MeaningRecognitionAPI {
 	protected Map<String, String> getAuthorizationParameters() {
 		Map<String, String> map = new HashMap<String, String>();
 
-		if (getCustomerId() != null) {
-			map.put("customerId", getCustomerId());
+		if (getAppId() != null) {
+			map.put("app_id", getAppId());
 		}
-		if (getApiKey() != null) {
-			map.put("apiKey", getApiKey());
+		if (getAppKey() != null) {
+			map.put("app_key", getAppKey());
 		}
 
 		return map;
@@ -154,7 +151,11 @@ public class MeaningRecognitionAPI {
 
 	protected String callRestfulWebService(Map<String, String> parameters, String body) throws Exception {
 		String response = null;
-		final String queryString = parameters.isEmpty() ? "" : buildWebQuery(parameters);
+
+		HashMap<String, String> mergedParameters = new HashMap<String, String>(parameters);
+		mergedParameters.put("body", body);
+		
+		final String queryString = parameters.isEmpty() ? "" : buildWebQuery(mergedParameters);
 
 		URL netUrl = new URL(url + "?" + queryString);
 
@@ -172,7 +173,6 @@ public class MeaningRecognitionAPI {
 
 		// Send query
 		PrintStream ps = new PrintStream(connection.getOutputStream());
-		ps.print(urlEncodeBody ? URLEncoder.encode(body, "UTF-8") : body);
 		ps.close();
 
 		// Retrieve result

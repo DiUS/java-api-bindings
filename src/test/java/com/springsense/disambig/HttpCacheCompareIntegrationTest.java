@@ -30,8 +30,8 @@ public class HttpCacheCompareIntegrationTest {
 
 	@Before
 	public void setUp() {
-		directApi = new MeaningRecognitionAPI("http://192.168.0.96:8989/disambiguate", null, null, null, true);
-		cachedApi = new MeaningRecognitionAPI("http://192.168.0.96:88/disambiguate", null, null, null, true);
+		directApi = new MeaningRecognitionAPI("http://192.168.0.96:8989/disambiguate", null, null, null);
+		cachedApi = new MeaningRecognitionAPI("http://192.168.0.96:88/disambiguate", null, null, null);
 	}
 
 	//@Test
