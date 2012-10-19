@@ -8,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import org.junit.After;
@@ -43,9 +42,8 @@ public class CachedMeaningRecognitionAPIPersistenceTest {
 
 	private MeaningRecognitionAPI createApiInstance() {
 		return new CachedMeaningRecognitionAPI("no url", "fake id", "fake password",
-				null, 10, 4, tempCacheDir) {
-			protected String callRestfulWebService(
-					Map<String, String> parameters, String body)
+				10, 4, tempCacheDir) {
+			protected String callRestfulWebService(String body)
 					throws Exception {
 				calls++;
 				return jsonResponse;
@@ -88,8 +86,8 @@ public class CachedMeaningRecognitionAPIPersistenceTest {
 	@Test(expected = RuntimeException.class)
 	public void constructorShouldThrowExceptionIfCacheStoreDirIsNotADir()
 			throws Exception {
-		new CachedMeaningRecognitionAPI("no url", "fake id", "fake password", null,
-				10, 4, File.createTempFile("cache", "ignore"));
+		new CachedMeaningRecognitionAPI("no url", "fake id", "fake password", 10,
+				4, File.createTempFile("cache", "ignore"));
 	}
 
 	@Test

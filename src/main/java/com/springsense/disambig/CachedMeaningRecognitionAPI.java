@@ -7,7 +7,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Proxy;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -29,13 +28,11 @@ public class CachedMeaningRecognitionAPI extends MeaningRecognitionAPI {
 	 * 
 	 * @param url
 	 *            The end-point URL to use. Most likely
-	 *            http://api.springsense.com/disambiguate
-	 * @param customerId
-	 *            Your customer id, get yours at http://springsense.com/api
-	 * @param apiKey
-	 *            Your secret API key
-	 * @param proxy
-	 *            The proxy to use for communications
+	 *            https://springsense.p.mashape.com/disambiguate
+	 * @param publicKey
+	 *            Your public Mashape key, get yours at https://www.mashape.com/springsense/springsense-meaning-recognition
+	 * @param privateKey
+	 *            Your private key
 	 * @param maxCacheSize
 	 *            Maximum number of entries to store in the in-memory cache
 	 * @param expectedNumberOfConcurrentThreads
@@ -45,9 +42,8 @@ public class CachedMeaningRecognitionAPI extends MeaningRecognitionAPI {
 	 *            Directory to load from, and then store cache entries to.
 	 *            Optional, may be null
 	 */
-	public CachedMeaningRecognitionAPI(String url, String customerId, String apiKey, Proxy proxy, int maxCacheSize, int expectedNumberOfConcurrentThreads,
-			File cacheStoreDir) {
-		super(url, customerId, apiKey, proxy);
+	public CachedMeaningRecognitionAPI(String url, String publicKey, String privateKey, int maxCacheSize, int expectedNumberOfConcurrentThreads, File cacheStoreDir) {
+		super(url, publicKey, privateKey);
 
 		cache = buildLRUCache(maxCacheSize, expectedNumberOfConcurrentThreads);
 		this.cacheStoreDir = cacheStoreDir;

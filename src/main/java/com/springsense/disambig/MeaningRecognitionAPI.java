@@ -1,14 +1,17 @@
 package com.springsense.disambig;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.net.Proxy;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import com.mashape.client.authentication.Authentication;
+import com.mashape.client.authentication.MashapeAuthentication;
+import com.mashape.client.http.ContentType;
+import com.mashape.client.http.HttpClient;
+import com.mashape.client.http.HttpMethod;
+import com.mashape.client.http.MashapeResponse;
+import com.mashape.client.http.ResponseType;
 
 /**
  * SpringSense Meaning Recognition API binding class
@@ -19,12 +22,14 @@ public class MeaningRecognitionAPI {
 	private static final int DEFAULT_WAIT_BETWEEN_RETRIES = 2000;
 
 	private String url;
-	private String appId;
-	private String appKey;
-	private Proxy proxy;
+	private String publicKey;
+	private String privateKey;
+
+	private List<Authentication> authenticationHandlers;
 
 	private int numberOfRetries = DEFAULT_NUMBER_OF_RETRIES;
 	private long waitBetweenRetries = DEFAULT_WAIT_BETWEEN_RETRIES;
+	
 
 	/**
 	 * Creates a Meaning Recognition API entry point with the specified end-point
@@ -32,43 +37,24 @@ public class MeaningRecognitionAPI {
 	 * 
 	 * @param url
 	 *            The end-point URL to use. Most likely
-	 *            http://api.springsense.com:8081/v1/disambiguate
-	 * @param appId
-	 *            Your application id, get yours at http://springsense.com/api
-	 * @param appKey
-	 *            Your secret application key
+	 *            https://springsense.p.mashape.com/disambiguate
+	 * @param publicKey
+	 *            Your public Mashape key, get yours at https://www.mashape.com/springsense/springsense-meaning-recognition
+	 * @param privateKey
+	 *            Your private key
 	 */
-	public MeaningRecognitionAPI(String url, String appId, String appKey) {
-		this(url, appId, appKey, null);
-	}
-
-	/**
-	 * Create a Meaning Recognition API entry point with the specified end-point
-	 * URL, customer id and API key, going through the specified proxy
-	 * 
-	 * @param url
-	 *            The end-point URL to use. Most likely
-	 *            http://api.springsense.com:8081/v1/disambiguate
-	 * @param appId
-	 *            Your application id, get yours at http://springsense.com/api
-	 * @param appKey
-	 *            Your secret application key
-	 * @param proxy
-	 *            The Proxy to use for communications, optional.
-	 */
-	public MeaningRecognitionAPI(String url, String appId, String appKey, Proxy proxy) {
+	public MeaningRecognitionAPI(String url, String publicKey, String privateKey) {
 		this.url = url;
-		this.appId = appId;
-		this.appKey = appKey;
-		this.proxy = proxy;
+		this.publicKey = publicKey;
+		this.privateKey = privateKey;
 	}
 
-	String getAppKey() {
-		return appKey;
+	String getPrivateKey() {
+		return privateKey;
 	}
 
-	String getAppId() {
-		return appId;
+	String getPublicKey() {
+		return publicKey;
 	}
 
 	String getUrl() {
@@ -108,7 +94,7 @@ public class MeaningRecognitionAPI {
 		while (jsonResponse == null) {
 			attempt++;
 			try {
-				jsonResponse = callRestfulWebService(getAuthorizationParameters(), textToRecognize);
+				jsonResponse = callRestfulWebService(textToRecognize);
 			} catch (Exception e) {
 				if (attempt > getNumberOfRetries()) {
 					throw new RuntimeException(String.format("Tried %d times, but still could not disambiguate '%s'. Latest error attached.", attempt,
@@ -126,73 +112,30 @@ public class MeaningRecognitionAPI {
 		return DisambiguationResult.fromJson(jsonResponse);
 	}
 
-	protected Map<String, String> getAuthorizationParameters() {
-		Map<String, String> map = new HashMap<String, String>();
+	protected String callRestfulWebService(String body) throws Exception {
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put("body", body);
 
-		if (getAppId() != null) {
-			map.put("app_id", getAppId());
-		}
-		if (getAppKey() != null) {
-			map.put("app_key", getAppKey());
-		}
-
-		return map;
-	}
-
-	protected String buildWebQuery(Map<String, String> parameters) throws Exception {
-		StringBuilder sb = new StringBuilder();
-		for (Map.Entry<String, String> entry : parameters.entrySet()) {
-			String key = URLEncoder.encode(entry.getKey(), "UTF-8");
-			String value = URLEncoder.encode(entry.getValue(), "UTF-8");
-			sb.append(key).append("=").append(value).append("&");
-		}
-		return sb.toString().substring(0, sb.length() - 1);
-	}
-
-	protected String callRestfulWebService(Map<String, String> parameters, String body) throws Exception {
-		String response = null;
-
-		HashMap<String, String> mergedParameters = new HashMap<String, String>(parameters);
-		mergedParameters.put("body", body);
+        MashapeResponse<String> response = HttpClient.doRequest(String.class,
+                HttpMethod.GET,
+                getUrl(),
+                parameters,
+                ContentType.FORM,
+                ResponseType.STRING,
+                getAuthenticationHandlers());
 		
-		final String queryString = parameters.isEmpty() ? "" : buildWebQuery(mergedParameters);
-
-		URL netUrl = new URL(url + "?" + queryString);
-
-		// Make post mode connection
-		URLConnection connection = null;
-		if (proxy == null) {
-			connection = netUrl.openConnection();
-		} else {
-			connection = netUrl.openConnection(proxy);
-		}
-		connection.setDoInput(true);
-		connection.setDoOutput(true);
-		connection.setAllowUserInteraction(false);
-		connection.setUseCaches(false);
-
-		// Send query
-		PrintStream ps = new PrintStream(connection.getOutputStream());
-		ps.close();
-
-		// Retrieve result
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-			StringBuilder sb = new StringBuilder();
-			String line;
-			while ((line = br.readLine()) != null) {
-				sb.append(line);
-				sb.append("\n");
-			}
-			response = sb.toString();
-		} finally {
-			if (br != null) {
-				br.close();
-			}
-		}
-
-		return response;
+		return response.getBody();
 	}
 
+	private List<Authentication> getAuthenticationHandlers() {
+		if (authenticationHandlers == null) {
+			authenticationHandlers = new ArrayList<Authentication>(1);
+			
+			authenticationHandlers.add(new MashapeAuthentication(getPublicKey(), getPrivateKey()));
+		}
+		
+		return authenticationHandlers;
+	}
+
+	
 }

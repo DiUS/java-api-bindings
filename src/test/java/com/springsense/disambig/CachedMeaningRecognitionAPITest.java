@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,9 +20,8 @@ public class CachedMeaningRecognitionAPITest {
 	public void setUp() throws IOException {
 
 		api = new CachedMeaningRecognitionAPI("no url", "fake id", "fake password",
-				null, 10, 4, null) {
-			protected String callRestfulWebService(
-					Map<String, String> parameters, String body)
+				10, 4, null) {
+			protected String callRestfulWebService(String body)
 					throws Exception {
 				calls++;
 				return jsonResponse;
