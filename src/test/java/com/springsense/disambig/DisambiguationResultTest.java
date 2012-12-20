@@ -74,6 +74,19 @@ public class DisambiguationResultTest {
 	}
 
 	@Test
+	public void testSentenceEquivalenceIsTolerant() {
+		assertTrue(result.getSentences().size() == 6);
+		
+		Sentence alternateCopyMultipleMeaningsSentence = DisambiguationResult.fromJson(jsonResponse).getSentences().get(2);
+		
+		assertTrue(multipleMeaningsSentence.equivalentTo(alternateCopyMultipleMeaningsSentence));
+		alternateCopyMultipleMeaningsSentence.getScores()[0] -= 0.9;
+		assertTrue(multipleMeaningsSentence.equivalentTo(alternateCopyMultipleMeaningsSentence));
+		alternateCopyMultipleMeaningsSentence.getScores()[1] -= 2.0;
+		assertTrue(!multipleMeaningsSentence.equivalentTo(alternateCopyMultipleMeaningsSentence));
+	}
+
+	@Test
 	public void testScores() {
 		assertEquals(3, multipleMeaningsSentence.getScores().length);
 	}
@@ -97,6 +110,11 @@ public class DisambiguationResultTest {
 		assertEquals(
 				"a device incised to make an impression; used to secure a closing or to authenticate documents",
 				meaning.getDefinition());
+	}
+
+	@Test
+	public void testThereShouldNotBeASenseKey() {
+		assertEquals(null, meaning.getSenseKey());
 	}
 
 	@Test

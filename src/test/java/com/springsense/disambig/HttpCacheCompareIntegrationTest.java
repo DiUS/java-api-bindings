@@ -30,11 +30,11 @@ public class HttpCacheCompareIntegrationTest {
 
 	@Before
 	public void setUp() {
-		directApi = new MeaningRecognitionAPI("http://192.168.0.96:8989/disambiguate", null, null);
-		cachedApi = new MeaningRecognitionAPI("http://192.168.0.96:88/disambiguate", null, null);
+		directApi = new MeaningRecognitionAPI("http://localhost:8080/disambiguate", null, null);
+		cachedApi = new MeaningRecognitionAPI("http://localhost:8080/disambiguate", null, null);
 	}
 
-	//@Test
+	// @Test
 	public void testRecognize() throws Exception {
 		verifyCachedIsSame("black box");
 		verifyCachedIsSame("cat vet");
@@ -57,13 +57,13 @@ public class HttpCacheCompareIntegrationTest {
 
 	private List<String> testPages() throws IOException {
 		List<String> lines = IOUtils.readLines(HttpCacheCompareIntegrationTest.class.getClassLoader().getResourceAsStream(
-				"com/springsense/disambig/random_sentences.txt"));
+				"random_sentences.txt"));
 		Collections.shuffle(lines);
 
 		List<String> pages = new LinkedList<String>();
 		
 		int i = 0;
-		int linesInPage = 200;
+		int linesInPage = 25;
 
 		StringBuilder pageBuilder = new StringBuilder();
 		for (String line : lines) {

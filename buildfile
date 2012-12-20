@@ -3,10 +3,10 @@ require "bundler/setup"
 require 'buildr-dependency-extensions'
 
 # Version number for this release
-VERSION_NUMBER = "1.2.#{ENV['BUILD_NUMBER'] || 'SNAPSHOT'}"
+VERSION_NUMBER = "1.3.#{ENV['BUILD_NUMBER'] || 'SNAPSHOT'}"
 # Group identifier for your projects
 GROUP = "com.springsense"
-COPYRIGHT = "(C) Copyright 2011 SpringSense Trust. All rights reserved. Licensed under  the Apache License, Version 2.0. See file LICENSE."
+COPYRIGHT = "(C) Copyright 2011, 2012 SpringSense Trust. All rights reserved. Licensed under  the Apache License, Version 2.0. See file LICENSE."
 
 # Specify Maven 2.0 remote repositories here, like this:
 repositories.remote << "http://www.ibiblio.org/maven2"

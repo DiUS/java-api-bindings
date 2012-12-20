@@ -22,7 +22,7 @@ public class DisambiguationResult implements Serializable {
 	private List<Sentence> sentences = null;
 	private List<Variant> variants = null;
 
-	static DisambiguationResult fromJson(String json) {
+	public static DisambiguationResult fromJson(String json) {
 		List<Sentence> sentences = new Gson().fromJson(json, new TypeToken<List<Sentence>>() {
 		}.getType());
 
@@ -139,6 +139,40 @@ public class DisambiguationResult implements Serializable {
 			}
 		} else if (!sentences.equals(other.sentences)) {
 			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Answer true if the receiver is equal to obj in all regards
+	 * except for having equal scores.
+	 * 
+	 * @param obj
+	 * @return
+	 */
+	public boolean equivalentTo(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		DisambiguationResult other = (DisambiguationResult) obj;
+		if (sentences == null) {
+			if (other.sentences != null) {
+				return false;
+			}
+		} else if (sentences.size() != other.sentences.size()) {
+			return false;
+		} else {
+			for (int i = 0; i < sentences.size(); i++) {
+				if (!sentences.get(i).equivalentTo(other.sentences.get(i))) {
+					return false;
+				}
+			}
 		}
 		return true;
 	}
@@ -277,6 +311,45 @@ public class DisambiguationResult implements Serializable {
 			}
 			
 			double tolerance = 0.001;
+			for (int i = 0; i < scores.length; i++) {
+				if (Math.abs(scores[i] - other.scores[i]) > tolerance) {
+					return false;
+				}
+			}
+
+			if (terms == null) {
+				if (other.terms != null) {
+					return false;
+				}
+			} else if (!terms.equals(other.terms)) {
+				return false;
+			}
+			return true;
+		}
+
+		/**
+		 * Answer true if the receiver is equal to obj in all regards
+		 * except for having equal scores.
+		 * 
+		 * @param obj
+		 * @return
+		 */
+		public boolean equivalentTo(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			Sentence other = (Sentence) obj;
+			if (scores.length != other.scores.length) {
+				return false;
+			}
+			
+			double tolerance = 1.0;
 			for (int i = 0; i < scores.length; i++) {
 				if (Math.abs(scores[i] - other.scores[i]) > tolerance) {
 					return false;
@@ -595,12 +668,15 @@ public class DisambiguationResult implements Serializable {
 
 	/**
 	 * One potential meaning of a term, with its definition
+	 * No check is made for semantic consistency between meaning and the senseKey
 	 */
 	public static class Meaning implements Serializable {
 
 		private static final long serialVersionUID = 1L;
 		private String definition;
 		private String meaning;
+		private String senseKey;
+		private double probability = 0.0;
 
 		protected Meaning() {
 		}
@@ -609,6 +685,14 @@ public class DisambiguationResult implements Serializable {
 			super();
 			this.definition = definition;
 			this.meaning = meaning;
+		}
+
+		public Meaning(String meaning, String definition, String senseKey, double probability) {
+			super();
+			this.definition = definition;
+			this.meaning = meaning;
+			this.senseKey = senseKey;
+			this.probability = probability;
 		}
 
 		/**
@@ -625,10 +709,10 @@ public class DisambiguationResult implements Serializable {
 		}
 
 		/**
-		 * Returns the meaning token for the meaning, according to the WordNet
+		 * Returns the meaning token for the meaning, according to the WordNet in NLTK format
 		 * conventions
 		 * 
-		 * @return The meaning token for the meaning, according to the WordNet
+		 * @return The meaning token for the meaning, according to the WordNet in NLTK format
 		 *         conventions
 		 */
 		public String getMeaning() {
@@ -640,8 +724,35 @@ public class DisambiguationResult implements Serializable {
 		}
 
 		public boolean isEntityType() {
-			return (("person_n_01".equals(getMeaning())) || ("association_n_01".equals(getMeaning())) || ("location_n_01".equals(getMeaning())));
+			if (getMeaning() != null) {
+				return (("person_n_01".equals(getMeaning())) || ("association_n_01".equals(getMeaning())) || ("location_n_01".equals(getMeaning())));
+			}
+			return (("person%1:03:00::".equals(getSenseKey())) || ("association%1:14:00::".equals(getSenseKey())) || ("location%1:03:00::".equals(getSenseKey())));
 
+		}
+
+		/**
+		 * Returns the meaning token for the meaning, according to the WordNet in WordNet format
+		 * conventions
+		 * 
+		 * @return The meaning token for the meaning, according to the WordNet in WordNet format
+		 *         conventions
+		 */
+		public String getSenseKey() {
+			return senseKey;
+		}
+
+		/**
+		 * Returns the probability that this  meaning appears in all combinations of disambiguations of the text
+		 * 
+		 * @return The probability for this meaning to occur
+		 */
+		public double getProbability() {
+			return probability;
+		}
+
+		protected void setSenseKey(String senseKey) {
+			this.senseKey = senseKey;
 		}
 
 		@Override
@@ -650,12 +761,19 @@ public class DisambiguationResult implements Serializable {
 			int result = 1;
 			result = prime * result + ((definition == null) ? 0 : definition.hashCode());
 			result = prime * result + ((meaning == null) ? 0 : meaning.hashCode());
+			result = prime * result + ((senseKey == null) ? 0 : senseKey.hashCode());
 			return result;
 		}
 
 		@Override
 		public String toString() {
-			return String.format("'meaning':{'meaning':'%s','definition':'%s'}", meaning, definition);
+			if (senseKey == null) {
+				return String.format("'meaning':{'meaning':'%s','definition':'%s'}", meaning, definition);
+			}
+			if (probability > 0.0) {
+				return String.format("'meaning':{'meaning':'%s','senseKey':'%s','definition':'%s','probability':'%f'}", meaning, senseKey, definition, probability);
+			}
+			return String.format("'meaning':{'meaning':'%s','senseKey':'%s','definition':'%s'}", meaning, senseKey, definition);
 		}
 
 		@Override
@@ -682,6 +800,13 @@ public class DisambiguationResult implements Serializable {
 					return false;
 				}
 			} else if (!meaning.equals(other.meaning)) {
+				return false;
+			}
+			if (senseKey == null) {
+				if (other.senseKey != null) {
+					return false;
+				}
+			} else if (!senseKey.equals(other.senseKey)) {
 				return false;
 			}
 			return true;
