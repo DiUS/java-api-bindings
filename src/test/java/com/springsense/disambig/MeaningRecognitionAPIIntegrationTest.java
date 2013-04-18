@@ -8,14 +8,13 @@ import static org.junit.Assert.*;
 
 public class MeaningRecognitionAPIIntegrationTest {
 
-	private static final String PUBLIC_KEY = System.getenv("MASHAPE_PUBLIC_KEY");;
-	private static final String PRIVATE_KEY = System.getenv("MASHAPE_PRIVATE_KEY");
+	private static final String API_KEY = System.getenv("MASHAPE_KEY");
 	
 	private MeaningRecognitionAPI api;
 
 	@Before
 	public void setUp() {
-		api = new MeaningRecognitionAPI("https://springsense.p.mashape.com/disambiguate", PUBLIC_KEY, PRIVATE_KEY);
+		api = new MeaningRecognitionAPI("https://springsense.p.mashape.com/disambiguate", API_KEY);
 	}
 
 	@After
@@ -25,8 +24,7 @@ public class MeaningRecognitionAPIIntegrationTest {
 	@Test
 	public void testConstructor() {
 		assertEquals("https://springsense.p.mashape.com/disambiguate", api.getUrl());
-		assertEquals(PUBLIC_KEY, api.getPublicKey());
-		assertEquals(PRIVATE_KEY, api.getPrivateKey());
+		assertEquals(API_KEY, api.getApiKey());
 	}
 
 	@Test

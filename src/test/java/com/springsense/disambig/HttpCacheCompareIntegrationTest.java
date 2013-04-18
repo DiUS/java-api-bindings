@@ -30,15 +30,16 @@ public class HttpCacheCompareIntegrationTest {
 
 	@Before
 	public void setUp() {
-		directApi = new MeaningRecognitionAPI("http://localhost:8080/disambiguate", null, null);
-		cachedApi = new MeaningRecognitionAPI("http://localhost:8080/disambiguate", null, null);
+		directApi = new MeaningRecognitionAPI("http://v2.api.springsense.com:8080/disambiguate", null);
+		cachedApi = new MeaningRecognitionAPI("http://v2.api.springsense.com:8080/disambiguate", null);
 	}
 
-	// @Test
+	@Test
 	public void testRecognize() throws Exception {
 		verifyCachedIsSame("black box");
-		verifyCachedIsSame("cat vet");
+		verifyCachedIsSame("cat+vet");
 
+		if (true) return;
 		List<String> pages = testPages();
 
 		for (String page : pages) {

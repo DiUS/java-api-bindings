@@ -1,17 +1,9 @@
 package com.springsense.disambig;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.apache.http.client.utils.URIBuilder;
 
-import com.mashape.client.authentication.Authentication;
-import com.mashape.client.authentication.MashapeAuthentication;
-import com.mashape.client.http.ContentType;
-import com.mashape.client.http.HttpClient;
-import com.mashape.client.http.HttpMethod;
-import com.mashape.client.http.MashapeResponse;
-import com.mashape.client.http.ResponseType;
+import com.mashape.unicorn.http.HttpResponse;
+import com.mashape.unicorn.http.Unicorn;
 
 /**
  * SpringSense Meaning Recognition API binding class
@@ -22,10 +14,7 @@ public class MeaningRecognitionAPI {
 	private static final int DEFAULT_WAIT_BETWEEN_RETRIES = 2000;
 
 	private String url;
-	private String publicKey;
-	private String privateKey;
-
-	private List<Authentication> authenticationHandlers;
+	private String apiKey;
 
 	private int numberOfRetries = DEFAULT_NUMBER_OF_RETRIES;
 	private long waitBetweenRetries = DEFAULT_WAIT_BETWEEN_RETRIES;
@@ -38,23 +27,16 @@ public class MeaningRecognitionAPI {
 	 * @param url
 	 *            The end-point URL to use. Most likely
 	 *            https://springsense.p.mashape.com/disambiguate
-	 * @param publicKey
-	 *            Your public Mashape key, get yours at https://www.mashape.com/springsense/springsense-meaning-recognition
-	 * @param privateKey
+	 * @param apiKey
 	 *            Your private key
 	 */
-	public MeaningRecognitionAPI(String url, String publicKey, String privateKey) {
+	public MeaningRecognitionAPI(String url, String apiKey) {
 		this.url = url;
-		this.publicKey = publicKey;
-		this.privateKey = privateKey;
+		this.apiKey = apiKey;
 	}
 
-	String getPrivateKey() {
-		return privateKey;
-	}
-
-	String getPublicKey() {
-		return publicKey;
+	String getApiKey() {
+		return apiKey;
 	}
 
 	String getUrl() {
@@ -113,29 +95,19 @@ public class MeaningRecognitionAPI {
 	}
 
 	protected String callRestfulWebService(String body) throws Exception {
-		Map<String, Object> parameters = new HashMap<String, Object>();
-		parameters.put("body", body);
-
-        MashapeResponse<String> response = HttpClient.doRequest(String.class,
-                HttpMethod.GET,
-                getUrl(),
-                parameters,
-                ContentType.FORM,
-                ResponseType.STRING,
-                getAuthenticationHandlers());
-		
+		URIBuilder uriBuilder = new URIBuilder(getUrl());
+		uriBuilder.addParameter("body", body);
+        final String urlString = uriBuilder.build().toString();
+        
+		HttpResponse<String> response = Unicorn.get(urlString)
+        		  .header("accept", "application/json")
+        		  .header("X-Mashape-Authorization", getApiKey())
+        		  .asString();
+        
+		if (response.getCode() != 200) {
+			throw new RuntimeException(String.format("%d error received from server: '%s'", response.getCode(), response.getBody()));
+		}
 		return response.getBody();
 	}
-
-	private List<Authentication> getAuthenticationHandlers() {
-		if (authenticationHandlers == null) {
-			authenticationHandlers = new ArrayList<Authentication>(1);
-			
-			authenticationHandlers.add(new MashapeAuthentication(getPublicKey(), getPrivateKey()));
-		}
-		
-		return authenticationHandlers;
-	}
-
 	
 }

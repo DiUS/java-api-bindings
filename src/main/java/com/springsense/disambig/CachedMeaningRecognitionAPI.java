@@ -29,9 +29,7 @@ public class CachedMeaningRecognitionAPI extends MeaningRecognitionAPI {
 	 * @param url
 	 *            The end-point URL to use. Most likely
 	 *            https://springsense.p.mashape.com/disambiguate
-	 * @param publicKey
-	 *            Your public Mashape key, get yours at https://www.mashape.com/springsense/springsense-meaning-recognition
-	 * @param privateKey
+	 * @param apiKey
 	 *            Your private key
 	 * @param maxCacheSize
 	 *            Maximum number of entries to store in the in-memory cache
@@ -42,8 +40,8 @@ public class CachedMeaningRecognitionAPI extends MeaningRecognitionAPI {
 	 *            Directory to load from, and then store cache entries to.
 	 *            Optional, may be null
 	 */
-	public CachedMeaningRecognitionAPI(String url, String publicKey, String privateKey, int maxCacheSize, int expectedNumberOfConcurrentThreads, File cacheStoreDir) {
-		super(url, publicKey, privateKey);
+	public CachedMeaningRecognitionAPI(String url, String apiKey, int maxCacheSize, int expectedNumberOfConcurrentThreads, File cacheStoreDir) {
+		super(url, apiKey);
 
 		cache = buildLRUCache(maxCacheSize, expectedNumberOfConcurrentThreads);
 		this.cacheStoreDir = cacheStoreDir;

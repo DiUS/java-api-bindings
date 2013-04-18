@@ -41,8 +41,8 @@ public class CachedMeaningRecognitionAPIPersistenceTest {
 	}
 
 	private MeaningRecognitionAPI createApiInstance() {
-		return new CachedMeaningRecognitionAPI("no url", "fake id", "fake password",
-				10, 4, tempCacheDir) {
+		return new CachedMeaningRecognitionAPI("no url", "fake password", 10,
+				4, tempCacheDir) {
 			protected String callRestfulWebService(String body)
 					throws Exception {
 				calls++;
@@ -86,8 +86,8 @@ public class CachedMeaningRecognitionAPIPersistenceTest {
 	@Test(expected = RuntimeException.class)
 	public void constructorShouldThrowExceptionIfCacheStoreDirIsNotADir()
 			throws Exception {
-		new CachedMeaningRecognitionAPI("no url", "fake id", "fake password", 10,
-				4, File.createTempFile("cache", "ignore"));
+		new CachedMeaningRecognitionAPI("no url", "fake password", 10, 4,
+				File.createTempFile("cache", "ignore"));
 	}
 
 	@Test

@@ -19,8 +19,8 @@ public class CachedMeaningRecognitionAPITest {
 	@Before
 	public void setUp() throws IOException {
 
-		api = new CachedMeaningRecognitionAPI("no url", "fake id", "fake password",
-				10, 4, null) {
+		api = new CachedMeaningRecognitionAPI("no url", "fake password", 10,
+				4, null) {
 			protected String callRestfulWebService(String body)
 					throws Exception {
 				calls++;
