@@ -12,7 +12,7 @@ COPYRIGHT = "(C) Copyright 2011, 2012, 2013 SpringSense Trust. All rights reserv
 repositories.remote << "http://www.ibiblio.org/maven2"
 repositories.remote << "http://repo1.maven.org/maven2"
 repositories.remote << "http://maven.mashape.com/releases"
-repositories.release_to = 'sftp://artifacts:repository@192.168.0.96/home/artifacts/repository'
+repositories.release_to = 'sftp://artifacts:repository@ci.internal.springsense.com/home/artifacts/repository'
 
 desc "The Java_api_bindings project"
 define "java_api_bindings" do
@@ -46,12 +46,4 @@ define "java_api_bindings" do
   test.compile.with JUNIT4, HAMCREST, MOCKITO, COMMONS_IO, COMMONS_LANG
   
   package(:jar)
-end
-
-
-# This method calculates the requires transitive dependencies for an artifact
-def transitive_deps_for(project, dependency)
-  deps = [] 
-  TransitiveDependencies.instance_eval { add_dependency(project, deps, dependency, [nil, "compile", "runtime"]) }
-  deps.uniq!
 end
